@@ -18,7 +18,7 @@ int main(){
     cout << "Enter the number of disks: ";
     cin >> n;
     TOH(n, 'A', 'B', 'C');
-}0.
+}
 
 
 
