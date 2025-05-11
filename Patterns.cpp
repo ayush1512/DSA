@@ -11,6 +11,7 @@ int main(){
 
 
     // Pattern 1;
+    
     int n=5;
     // cin >> n;
     for(int i=0; i<n; i++){
@@ -71,5 +72,90 @@ int main(){
         cout << endl;
     }
     cout << endl;
+
+    // Pattern 7;
+
+    for(int i=0; i<n;i++){
+        for(int j=0;j<n-i-1;j++){
+            cout << " ";
+        }
+        for(int j=0;j<2*i+1;j++){
+            cout << "x";
+        }
+        for(int j=0;j<n-i-1;j++){
+            cout << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+
+    // Pattern 8;
+
+    for(int i=0; i<n;i++){
+        for(int j=0;j<i;j++){
+            cout << " ";
+        }
+        for(int j=0;j<2*n-2*i-1;j++){
+            cout << "x";
+        }
+        for(int j=0;j<i;j++){
+            cout << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+
+    // Pattern 9;
+
+    for(int i=0; i<n;i++){
+        for(int j=0;j<n-i-1;j++){
+            cout << " ";
+        }
+        for(int j=0;j<2*i+1;j++){
+            cout << "x";
+        }
+        for(int j=0;j<n-i-1;j++){
+            cout << " ";
+        }
+        cout << endl;
+    }
+    for(int i=0; i<n;i++){
+        for(int j=0;j<i;j++){
+            cout << " ";
+        }
+        for(int j=0;j<2*n-2*i-1;j++){
+            cout << "x";
+        }
+        for(int j=0;j<i;j++){
+            cout << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+
+    // Pattern 10;
+
+    for(int i=0; i<n-1;i++){
+        for(int j=0;j<i;j++){
+            cout << "*";
+        }
+        for(int j=0;j<n-i-1;j++){
+            cout << " ";
+        }
+        cout << endl;
+    }
+    for(int i=0; i<n-1;i++){
+        for(int j=0;j<n-i-1;j++){
+            cout << "*";
+        }
+        for(int j=0;j<i;j++){
+            cout << " ";
+        }
+        cout << endl;
+    }
+
+    cout << endl;
+
+    
 
 }
