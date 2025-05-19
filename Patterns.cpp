@@ -383,51 +383,125 @@ void print21(int n)
 {
     for (int i = 0; i < n; i++)
     {
-        for (int j = 0; j < n; j++){
-            if(i==0||i==n-1||j==0||j==n-1){cout << "*";}
-            else{cout << " ";}
+        for (int j = 0; j < n; j++)
+        {
+            if (i == 0 || i == n - 1 || j == 0 || j == n - 1)
+            {
+                cout << "*";
+            }
+            else
+            {
+                cout << " ";
+            }
         }
         cout << endl;
     }
 }
-void print22(int n) {
-    for(int i=0;i<2*n-1;i++){
-        for(int j=0;j<2*n-1;j++){
-           int top = i;
-           int left = j;
-           int right = (2*n - 2) - j;
-           int btm = (2*n - 2) - i;
+void print22(int n)
+{
+    for (int i = 0; i < 2 * n - 1; i++)
+    {
+        for (int j = 0; j < 2 * n - 1; j++)
+        {
+            int top = i;
+            int left = j;
+            int right = (2 * n - 2) - j;
+            int btm = (2 * n - 2) - i;
 
-           cout << (n-min(min(top,btm),min(left,right)));
-
+            cout << (n - min(min(top, btm), min(left, right)));
         }
         cout << endl;
     }
+}
+void print23(int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (i == (n) / 2)
+            {
+                cout << "*";
+            }
+            else if (i == n || j == (n - 1) / 2)
+            {
+                cout << "*";
+            }
+            else
+            {
+                cout << " ";
+            }
+        }
+        cout << endl;
+    }
+}
+void print24()
+{
+    int n = 6, m = 12;
+    for (int i = 0; i < n; i++)
+    {
+        if (i > 1 && i < 4)
+            for (int j = 0; j < m; j++)
+                cout << "*";
+        else
+        {
+            for (int j = 0; j < m / 3; j++)
+                cout << " ";
+            for (int j = 0; j < m / 3; j++)
+                cout << "*";
+            for (int j = 0; j < m / 3; j++)
+                cout << " ";
+        }
+        cout << endl;
+    }
+}
+void print25(int n)
+{
+    // Ensure n is odd for a proper center
+    if (n % 2 == 0)
+        n++; // Make n odd if it's even
+
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            // Print '*' for middle row or middle column
+            if (i == n / 2 || j == n / 2)
+                cout << "*";
+            else
+                cout << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
 }
 int main()
 {
     int n = 5;
-    // print1(n);
-    // print2(n);
-    // print3(n);
-    // print4(n);
-    // print5(n);
-    // print6(n);
-    // print7(n);
-    // print8(n);
-    // print9(n);
-    // print10(n);
-    // print11(n);
-    // print12(n);
-    // print13(n);
-    // print14(n);
-    // print15(n);
-    // print16(n);
-    // print17(n);
-    // print18(n);
-    // print19(n);
-    // print20(n);
-    // print21(n);
+    print1(n);
+    print2(n);
+    print3(n);
+    print4(n);
+    print5(n);
+    print6(n);
+    print7(n);
+    print8(n);
+    print9(n);
+    print10(n);
+    print11(n);
+    print12(n);
+    print13(n);
+    print14(n);
+    print15(n);
+    print16(n);
+    print17(n);
+    print18(n);
+    print19(n);
+    print20(n);
+    print21(n);
     print22(n);
+    print23(n);
+    print24();
+    print25(n);
     return 0;
 }
