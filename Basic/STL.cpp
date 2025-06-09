@@ -97,6 +97,65 @@ void explainPair()
 //     v1.swap(v2); // swap two vectors
 // }
 
+Notes for Vector Functions in C++ STL
+
+1. vector<int> v; 
+   - Declares a dynamic array of integers.
+
+2. v.push_back(value); 
+   - Adds 'value' to the end of the vector.
+
+3. v.emplace_back(value); 
+   - More efficient than push_back, constructs 'value' in place at the end.
+
+4. vector<pair<int, int>> vp; 
+   - Vector can store pairs or any other data type.
+
+5. vector<int> v1(5, 10); 
+   - Creates a vector of size 5, all elements initialized to 10.
+
+6. vector<int> v2(v1); 
+   - Copy constructor, creates a copy of v1.
+
+7. v.begin(), v.end(), v.rbegin(), v.rend(); 
+   - Iterators for traversing the vector (forward and reverse).
+
+8. v.at(index), v[index]; 
+   - Access elements at 'index'. at() does bounds checking.
+
+9. v.front(), v.back(); 
+   - Access first and last elements.
+
+10. v.erase(pos); 
+    - Removes element at position 'pos'.
+
+11. v.erase(start, end); 
+    - Removes elements in the range [start, end).
+
+12. v.insert(pos, value); 
+    - Inserts 'value' at position 'pos'.
+
+13. v.insert(pos, count, value); 
+    - Inserts 'value' 'count' times at 'pos'.
+
+14. v.insert(pos, start, end); 
+    - Inserts elements from another container/vector in the range [start, end) at 'pos'.
+
+15. v.pop_back(); 
+    - Removes the last element.
+
+16. v.clear(); 
+    - Removes all elements.
+
+17. v.empty(); 
+    - Returns true if vector is empty.
+
+18. v.size(); 
+    - Returns the number of elements.
+
+19. v1.swap(v2); 
+    - Swaps the contents of v1 and v2.
+
 void explainList()
 {
     // List is a doubly linked list that can be used to store elements.
