@@ -1,0 +1,119 @@
+Data Structures and Algorithms (DSA) in Python: Standard Library and Built-in Functions
+
+1. List
+- Dynamic array, supports indexing, slicing, and is mutable.
+- Methods: append, extend, insert, remove, pop, clear, index, count, sort, reverse, copy.
+Example:
+  arr = [1, 2, 3]
+  arr.append(4)
+  arr.sort()
+
+2. Tuple
+- Immutable sequence type.
+- Supports indexing, slicing.
+Example:
+  t = (1, 2, 3)
+
+3. Set
+- Unordered collection of unique elements.
+- Methods: add, remove, discard, pop, clear, union, intersection, difference, symmetric_difference.
+Example:
+  s = {1, 2, 3}
+  s.add(4)
+
+4. Dictionary
+- Key-value pairs, unordered (insertion ordered since Python 3.7).
+- Methods: keys, values, items, get, update, pop, popitem, clear.
+Example:
+  d = {'a': 1, 'b': 2}
+  d['c'] = 3
+
+5. Collections Module
+- deque: Double-ended queue (collections.deque)
+  Methods: append, appendleft, pop, popleft, extend, extendleft, rotate, reverse
+- Counter: Counts hashable objects (collections.Counter)
+- defaultdict: Dictionary with default values (collections.defaultdict)
+- OrderedDict: Dictionary that remembers insertion order (collections.OrderedDict)
+- namedtuple: Factory for tuple subclasses with named fields (collections.namedtuple)
+Example:
+  from collections import deque, Counter, defaultdict, namedtuple
+  dq = deque([1,2,3])
+  cnt = Counter([1,2,2,3])
+  dd = defaultdict(int)
+  Point = namedtuple('Point', 'x y')
+
+6. Heapq Module
+- Provides heap queue (priority queue) algorithms.
+- Functions: heappush, heappop, heapify, heappushpop, heapreplace, nlargest, nsmallest
+Example:
+  import heapq
+  heap = [3, 1, 4]
+  heapq.heapify(heap)
+  heapq.heappush(heap, 2)
+  smallest = heapq.heappop(heap)
+
+7. Queue Module
+- Provides FIFO queue (queue.Queue), LIFO queue (queue.LifoQueue), and PriorityQueue (queue.PriorityQueue)
+Example:
+  from queue import Queue, LifoQueue, PriorityQueue
+  q = Queue()
+  q.put(1)
+  q.get()
+
+8. Array Module
+- Efficient arrays of basic values (array.array)
+Example:
+  from array import array
+  arr = array('i', [1, 2, 3])
+
+9. String Functions
+- Common methods: split, join, find, replace, upper, lower, strip, startswith, endswith
+Example:
+  s = 'hello world'
+  s2 = s.replace('world', 'python')
+
+10. Built-in Functions Useful for DSA
+- len, min, max, sum, sorted, reversed, enumerate, zip, map, filter, any, all, range, list, set, dict, tuple
+Example:
+  arr = [1, 2, 3]
+  for i, val in enumerate(arr):
+      print(i, val)
+
+11. Itertools Module
+- Functions for efficient looping: product, permutations, combinations, combinations_with_replacement, accumulate, groupby, cycle, repeat, chain
+Example:
+  from itertools import permutations, combinations, product, accumulate
+  perms = list(permutations([1,2,3]))
+  combs = list(combinations([1,2,3], 2))
+
+12. Bisect Module
+- Functions for binary search: bisect_left, bisect_right, insort_left, insort_right
+Example:
+  import bisect
+  arr = [1, 2, 4, 5]
+  bisect.insort(arr, 3)
+
+13. Math Module
+- Functions: gcd, lcm, factorial, sqrt, ceil, floor, pow, log, comb, perm
+Example:
+  import math
+  math.gcd(12, 18)
+  math.comb(5, 2)
+
+14. Random Module
+- Functions: randint, randrange, choice, shuffle, sample
+Example:
+  import random
+  random.shuffle(arr)
+
+15. Time and Performance
+- time module for timing code (time.time, time.perf_counter)
+- functools.lru_cache for memoization
+Example:
+  from functools import lru_cache
+  @lru_cache(maxsize=None)
+  def fib(n):
+      if n < 2: return n
+      return fib(n-1) + fib(n-2)
+
+For more, see Python's official documentation and the standard library reference.
