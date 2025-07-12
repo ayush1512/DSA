@@ -1,20 +1,20 @@
 #include <bits/stdc++.h>
 using namespace std;
 int main(){
-    vector <int> arr;
-    int d,n;
-    cin >> d;
-    cin >> n;
-    d = d % n;
+    vector<int> nums;
+    int k, n;
+    cin >> k >> n;
+    if(n == 0) return 0;
+    k = k % n;
     for(int i = 0; i < n; i++){
         int x;
         cin >> x;
-        arr.push_back(x); 
+        nums.push_back(x); 
     }
-    reverse(arr.begin(),arr.begin()+d);
-    reverse(arr.begin()+d,arr.end());
-    reverse(arr.begin(),arr.end());
-    for(int i = 0; i < arr.size(); i++){
-        cout << arr[i] << " ";
+    reverse(nums.begin(), nums.begin() + k);
+    reverse(nums.begin() + k, nums.end());
+    reverse(nums.begin(), nums.end());
+    for(int num : nums){
+        cout << num << " ";
     }
 }
