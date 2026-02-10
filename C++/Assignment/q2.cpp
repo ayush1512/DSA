@@ -9,9 +9,9 @@ private:
 
 public:
     // Getter functions
-    void getAccno() { cout << this->accNumber << endl; }
-    void getHolder() { cout << this->accHolder << endl; }
-    void getBalance() { cout << this->balance << endl; }
+    void getAccno() const { cout << this->accNumber << endl; }
+    void getHolder() const { cout << this->accHolder << endl; }
+    void getBalance() const { cout << this->balance << endl; }
 
     // Setter functions
     void setAccno(int aNo) { this->accNumber = aNo; }

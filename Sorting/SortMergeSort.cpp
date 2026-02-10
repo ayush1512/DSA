@@ -53,14 +53,15 @@ void mergeSort(int *array, int l, int r) {
    }
 }
 int main() {
-   int n;
-   cout << "Enter the number of elements: ";
-   cin >> n;
-   int arr[n];     //create an array with given number of elements
-   cout << "Enter elements:" << endl;
-   for(int i = 0; i<n; i++) {
-      cin >> arr[i];
-   }
+   // cout << "Enter the number of elements: ";
+   // cin >> n;
+   // int arr[n];     //create an array with given number of elements
+   // cout << "Enter elements:" << endl;
+   // for(int i = 0; i<n; i++) {
+   //    cin >> arr[i];
+   // }
+   int arr[10] = {3,4,1,9,2,0,6,8,7,5};
+   int n = 10;
    cout << "Array before Sorting: ";
    display(arr, n);
    mergeSort(arr, 0, n-1);     //(n-1) for last index

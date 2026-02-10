@@ -1,119 +1,1396 @@
-Data Structures and Algorithms (DSA) in Python: Standard Library and Built-in Functions
+Data Structures and Algorithms (DSA) in Python: Comprehensive Guide
 
-1. List
+1. LIST
 - Dynamic array, supports indexing, slicing, and is mutable.
-- Methods: append, extend, insert, remove, pop, clear, index, count, sort, reverse, copy.
-Example:
-  arr = [1, 2, 3]
-  arr.append(4)
-  arr.sort()
+- Time Complexity: O(1) for append, O(n) for insert/remove at arbitrary positions
 
-2. Tuple
-- Immutable sequence type.
-- Supports indexing, slicing.
-Example:
-  t = (1, 2, 3)
+Methods:
 
-3. Set
-- Unordered collection of unique elements.
-- Methods: add, remove, discard, pop, clear, union, intersection, difference, symmetric_difference.
-Example:
-  s = {1, 2, 3}
-  s.add(4)
+append(item)
+  - Adds item to the end of the list
+  - Time: O(1)
+  Usage:
+    lst = [1, 2, 3]
+    lst.append(4)  # [1, 2, 3, 4]
 
-4. Dictionary
-- Key-value pairs, unordered (insertion ordered since Python 3.7).
-- Methods: keys, values, items, get, update, pop, popitem, clear.
-Example:
-  d = {'a': 1, 'b': 2}
-  d['c'] = 3
+extend(iterable)
+  - Adds all elements from an iterable to the end
+  - Time: O(k) where k is length of iterable
+  Usage:
+    lst = [1, 2]
+    lst.extend([3, 4, 5])  # [1, 2, 3, 4, 5]
+    lst.extend((6, 7))  # [1, 2, 3, 4, 5, 6, 7]
 
-5. Collections Module
-- deque: Double-ended queue (collections.deque)
-  Methods: append, appendleft, pop, popleft, extend, extendleft, rotate, reverse
-- Counter: Counts hashable objects (collections.Counter)
-- defaultdict: Dictionary with default values (collections.defaultdict)
-- OrderedDict: Dictionary that remembers insertion order (collections.OrderedDict)
-- namedtuple: Factory for tuple subclasses with named fields (collections.namedtuple)
-Example:
-  from collections import deque, Counter, defaultdict, namedtuple
-  dq = deque([1,2,3])
-  cnt = Counter([1,2,2,3])
-  dd = defaultdict(int)
+insert(index, item)
+  - Inserts item at specified index
+  - Time: O(n) due to shifting elements
+  Usage:
+    lst = [1, 2, 4]
+    lst.insert(2, 3)  # [1, 2, 3, 4]
+    lst.insert(0, 0)  # [0, 1, 2, 3, 4]
+
+remove(item)
+  - Removes first occurrence of item
+  - Raises ValueError if item not found
+  - Time: O(n)
+  Usage:
+    lst = [1, 2, 3, 2]
+    lst.remove(2)  # [1, 3, 2] - only first 2 removed
+    lst.remove(5)  # ValueError!
+
+pop(index=-1)
+  - Removes and returns item at index (default: last item)
+  - Raises IndexError if list is empty
+  - Time: O(1) for last element, O(n) for others
+  Usage:
+    lst = [1, 2, 3]
+    val = lst.pop()  # Returns 3, lst = [1, 2]
+    val = lst.pop(0)  # Returns 1, lst = [2]
+
+clear()
+  - Removes all items from the list
+  - Time: O(n)
+  Usage:
+    lst = [1, 2, 3]
+    lst.clear()  # []
+
+index(item, start=0, end=len(list))
+  - Returns index of first occurrence of item
+  - Raises ValueError if item not found
+  - Time: O(n)
+  Usage:
+    lst = [1, 2, 3, 2]
+    idx = lst.index(2)  # 1
+    idx = lst.index(2, 2)  # 3 (search from index 2)
+    idx = lst.index(5)  # ValueError!
+
+count(item)
+  - Returns number of occurrences of item
+  - Time: O(n)
+  Usage:
+    lst = [1, 2, 2, 3, 2]
+    cnt = lst.count(2)  # 3
+    cnt = lst.count(5)  # 0
+
+sort(key=None, reverse=False)
+  - Sorts list in-place
+  - Time: O(n log n) average
+  - Space: O(1) in-place
+  Usage:
+    lst = [3, 1, 4, 1, 5]
+    lst.sort()  # [1, 1, 3, 4, 5]
+    lst.sort(reverse=True)  # [5, 4, 3, 1, 1]
+    lst = [('a', 3), ('b', 1), ('c', 2)]
+    lst.sort(key=lambda x: x[1])  # [('b', 1), ('c', 2), ('a', 3)]
+
+reverse()
+  - Reverses list in-place
+  - Time: O(n)
+  Usage:
+    lst = [1, 2, 3]
+    lst.reverse()  # [3, 2, 1]
+
+copy()
+  - Creates shallow copy of the list
+  - Time: O(n)
+  Usage:
+    lst1 = [1, 2, 3]
+    lst2 = lst1.copy()  # [1, 2, 3]
+    lst2.append(4)  # lst1 unchanged
+
+Slicing Operations:
+  lst[start:end:step]  - Get slice (doesn't modify)
+  lst[1:3]  # Elements at index 1, 2
+  lst[::2]  # Every 2nd element
+  lst[::-1]  # Reversed (equivalent to reverse())
+  lst[1:] = [x, y, z]  # Replace elements from index 1
+
+---
+
+2. TUPLE
+- Immutable sequence, supports indexing, slicing
+- Time Complexity: O(1) for access, O(n) for search
+- Use when data shouldn't change and for hashable keys
+
+Methods:
+
+index(item, start=0, end=len(tuple))
+  - Returns index of first occurrence
+  - Raises ValueError if not found
+  - Time: O(n)
+  Usage:
+    t = (1, 2, 3, 2)
+    idx = t.index(2)  # 1
+    idx = t.index(5)  # ValueError!
+
+count(item)
+  - Returns number of occurrences
+  - Time: O(n)
+  Usage:
+    t = (1, 2, 2, 3, 2)
+    cnt = t.count(2)  # 3
+
+Slicing (same as list):
+  t[1:3]  # (2, 3)
+  t[::-1]  # Reversed tuple
+
+Tuple unpacking:
+  a, b, c = (1, 2, 3)
+  x, *rest = (1, 2, 3, 4)  # x=1, rest=[2,3,4]
+
+---
+
+3. SET
+- Unordered collection of unique elements
+- Time Complexity: O(1) average for add/remove/lookup
+- Automatically eliminates duplicates
+
+Methods:
+
+add(elem)
+  - Adds element to set (no effect if already present)
+  - Time: O(1)
+  Usage:
+    s = {1, 2, 3}
+    s.add(4)  # {1, 2, 3, 4}
+    s.add(3)  # {1, 2, 3, 4} (no change)
+
+remove(elem)
+  - Removes element from set
+  - Raises KeyError if not present
+  - Time: O(1)
+  Usage:
+    s = {1, 2, 3}
+    s.remove(2)  # {1, 3}
+    s.remove(5)  # KeyError!
+
+discard(elem)
+  - Removes element if present, does nothing otherwise
+  - Does not raise error
+  - Time: O(1)
+  Usage:
+    s = {1, 2, 3}
+    s.discard(2)  # {1, 3}
+    s.discard(5)  # {1, 3} (no error)
+
+pop()
+  - Removes and returns arbitrary element
+  - Raises KeyError if set is empty
+  - Time: O(1)
+  Usage:
+    s = {1, 2, 3}
+    elem = s.pop()  # Could be any of 1, 2, or 3
+
+clear()
+  - Removes all elements
+  - Time: O(n)
+  Usage:
+    s = {1, 2, 3}
+    s.clear()  # set()
+
+union(*others) or |
+  - Returns new set with all elements from both
+  - Time: O(len(s) + len(others))
+  Usage:
+    s1 = {1, 2, 3}
+    s2 = {3, 4, 5}
+    s3 = s1.union(s2)  # {1, 2, 3, 4, 5}
+    s3 = s1 | s2  # Same result
+
+intersection(*others) or &
+  - Returns new set with elements common to all
+  - Time: O(min(len(s), len(others)))
+  Usage:
+    s1 = {1, 2, 3}
+    s2 = {2, 3, 4}
+    s3 = s1.intersection(s2)  # {2, 3}
+    s3 = s1 & s2  # Same result
+
+difference(*others) or -
+  - Returns new set with elements in first but not in others
+  - Time: O(len(s))
+  Usage:
+    s1 = {1, 2, 3}
+    s2 = {2, 3, 4}
+    s3 = s1.difference(s2)  # {1}
+    s3 = s1 - s2  # Same result
+
+symmetric_difference(other) or ^
+  - Returns new set with elements in either but not both
+  - Time: O(len(s) + len(other))
+  Usage:
+    s1 = {1, 2, 3}
+    s2 = {2, 3, 4}
+    s3 = s1.symmetric_difference(s2)  # {1, 4}
+    s3 = s1 ^ s2  # Same result
+
+issubset(other) or <=
+  - Returns True if all elements of s are in other
+  - Time: O(len(s))
+  Usage:
+    s1 = {1, 2}
+    s2 = {1, 2, 3}
+    result = s1.issubset(s2)  # True
+    result = s1 <= s2  # Same result
+
+issuperset(other) or >=
+  - Returns True if s contains all elements of other
+  - Time: O(len(other))
+  Usage:
+    s1 = {1, 2, 3}
+    s2 = {2, 3}
+    result = s1.issuperset(s2)  # True
+    result = s1 >= s2  # Same result
+
+isdisjoint(other)
+  - Returns True if no common elements
+  - Time: O(min(len(s), len(other)))
+  Usage:
+    s1 = {1, 2}
+    s2 = {3, 4}
+    result = s1.isdisjoint(s2)  # True
+
+copy()
+  - Creates shallow copy
+  - Time: O(n)
+  Usage:
+    s1 = {1, 2, 3}
+    s2 = s1.copy()
+    s2.add(4)  # s1 unchanged
+
+In-place operations:
+  update(*others) or |=  - Add all elements from others
+  intersection_update(*others) or &=  - Keep only common
+  difference_update(*others) or -=  - Remove elements in others
+  symmetric_difference_update(other) or ^=  - Keep symmetric difference
+
+---
+
+4. DICTIONARY
+- Key-value pairs; insertion-ordered since Python 3.7
+- Time Complexity: O(1) average for lookup, insert, delete
+- Keys must be hashable (immutable); values can be any type
+
+Methods:
+
+keys()
+  - Returns view object of all keys
+  - Supports iteration and membership testing
+  - Time: O(n) iteration, O(1) lookup
+  Usage:
+    d = {'a': 1, 'b': 2, 'c': 3}
+    keys_view = d.keys()  # dict_keys(['a', 'b', 'c'])
+    'a' in keys_view  # True
+    for key in d.keys():
+        print(key)
+
+values()
+  - Returns view object of all values
+  - Time: O(n) iteration
+  Usage:
+    d = {'a': 1, 'b': 2}
+    vals = d.values()  # dict_values([1, 2])
+    for val in d.values():
+        print(val)
+
+items()
+  - Returns view object of (key, value) tuples
+  - Time: O(n) iteration
+  Usage:
+    d = {'a': 1, 'b': 2}
+    pairs = d.items()  # dict_items([('a', 1), ('b', 2)])
+    for key, val in d.items():
+        print(key, val)
+
+get(key, default=None)
+  - Returns value for key if exists, else default
+  - Never raises KeyError
+  - Time: O(1)
+  Usage:
+    d = {'a': 1, 'b': 2}
+    val = d.get('a')  # 1
+    val = d.get('x')  # None
+    val = d.get('x', 0)  # 0 (custom default)
+
+pop(key, default=<no default>)
+  - Removes key and returns its value
+  - Raises KeyError if key not found and no default
+  - Time: O(1)
+  Usage:
+    d = {'a': 1, 'b': 2}
+    val = d.pop('a')  # 1, d = {'b': 2}
+    val = d.pop('x', None)  # None (no error)
+    val = d.pop('x')  # KeyError!
+
+popitem()
+  - Removes and returns last inserted (key, value) pair
+  - Raises KeyError if dict is empty
+  - Time: O(1)
+  Usage:
+    d = {'a': 1, 'b': 2, 'c': 3}
+    key, val = d.popitem()  # ('c', 3), d = {'a': 1, 'b': 2}
+
+update(mapping/iterable)
+  - Updates dict with key-value pairs from mapping or iterable
+  - Overwrites existing keys
+  - Time: O(len(mapping))
+  Usage:
+    d = {'a': 1, 'b': 2}
+    d.update({'b': 20, 'c': 3})  # {'a': 1, 'b': 20, 'c': 3}
+    d.update([('d', 4), ('e', 5)])  # Add from list of tuples
+    d.update(x=10, y=20)  # Add from keyword arguments
+
+setdefault(key, default=None)
+  - Returns value if key exists, else sets key to default and returns default
+  - Time: O(1)
+  Usage:
+    d = {'a': 1}
+    val = d.setdefault('a', 10)  # 1 (key exists)
+    val = d.setdefault('b', 2)  # 2 (key created), d = {'a': 1, 'b': 2}
+
+clear()
+  - Removes all items
+  - Time: O(n)
+  Usage:
+    d = {'a': 1, 'b': 2}
+    d.clear()  # {}
+
+copy()
+  - Creates shallow copy
+  - Time: O(n)
+  Usage:
+    d1 = {'a': 1, 'b': 2}
+    d2 = d1.copy()
+    d2['c'] = 3  # d1 unchanged
+
+fromkeys(iterable, value=None)
+  - Creates new dict with keys from iterable, all values set to value
+  - Time: O(len(iterable))
+  Usage:
+    d = dict.fromkeys(['a', 'b', 'c'])  # {'a': None, 'b': None, 'c': None}
+    d = dict.fromkeys(range(3), 0)  # {0: 0, 1: 0, 2: 0}
+
+Direct access:
+  d[key]  - Get value (raises KeyError if not found)
+  d[key] = value  - Set value
+  del d[key]  - Delete key (raises KeyError if not found)
+  key in d  - Check if key exists
+
+---
+
+5. COLLECTIONS MODULE
+
+A. DEQUE (Double-Ended Queue)
+- Optimized for fast operations at both ends
+- Time: O(1) for all operations at both ends
+- Use for BFS, sliding window problems
+
+Methods:
+
+append(x)
+  - Adds element to the right end
+  - Time: O(1)
+  Usage:
+    from collections import deque
+    dq = deque([1, 2, 3])
+    dq.append(4)  # deque([1, 2, 3, 4])
+
+appendleft(x)
+  - Adds element to the left end
+  - Time: O(1)
+  Usage:
+    dq = deque([1, 2, 3])
+    dq.appendleft(0)  # deque([0, 1, 2, 3])
+
+pop()
+  - Removes and returns element from right end
+  - Raises IndexError if empty
+  - Time: O(1)
+  Usage:
+    dq = deque([1, 2, 3])
+    val = dq.pop()  # 3, dq = deque([1, 2])
+
+popleft()
+  - Removes and returns element from left end
+  - Raises IndexError if empty
+  - Time: O(1)
+  Usage:
+    dq = deque([1, 2, 3])
+    val = dq.popleft()  # 1, dq = deque([2, 3])
+
+extend(iterable)
+  - Adds multiple elements to right end
+  - Time: O(k) where k is length
+  Usage:
+    dq = deque([1, 2])
+    dq.extend([3, 4, 5])  # deque([1, 2, 3, 4, 5])
+
+extendleft(iterable)
+  - Adds multiple elements to left end (in reverse order)
+  - Time: O(k)
+  Usage:
+    dq = deque([1, 2])
+    dq.extendleft([5, 4, 3])  # deque([3, 4, 5, 1, 2])
+
+rotate(n)
+  - Rotates deque n steps to right (negative for left)
+  - Time: O(n)
+  Usage:
+    dq = deque([1, 2, 3, 4])
+    dq.rotate(1)  # deque([4, 1, 2, 3])
+    dq.rotate(-2)  # deque([2, 3, 4, 1])
+
+reverse()
+  - Reverses elements in-place
+  - Time: O(n)
+  Usage:
+    dq = deque([1, 2, 3])
+    dq.reverse()  # deque([3, 2, 1])
+
+clear()
+  - Removes all elements
+  - Time: O(n)
+  Usage:
+    dq = deque([1, 2, 3])
+    dq.clear()  # deque([])
+
+copy()
+  - Creates shallow copy
+  - Time: O(n)
+  Usage:
+    dq1 = deque([1, 2, 3])
+    dq2 = dq1.copy()
+
+count(x)
+  - Counts occurrences of x
+  - Time: O(n)
+  Usage:
+    dq = deque([1, 2, 2, 3])
+    cnt = dq.count(2)  # 2
+
+index(x)
+  - Returns index of first occurrence
+  - Raises ValueError if not found
+  - Time: O(n)
+  Usage:
+    dq = deque([1, 2, 3, 2])
+    idx = dq.index(2)  # 1
+
+remove(x)
+  - Removes first occurrence of x
+  - Raises ValueError if not found
+  - Time: O(n)
+  Usage:
+    dq = deque([1, 2, 3, 2])
+    dq.remove(2)  # deque([1, 3, 2])
+
+B. COUNTER
+- Counts hashable objects efficiently
+- Subclass of dict
+
+Methods:
+
+most_common(n=None)
+  - Returns list of (element, count) tuples, most common first
+  - If n is None, returns all
+  - Time: O(n log n) for sorting
+  Usage:
+    from collections import Counter
+    cnt = Counter([1, 2, 2, 3, 3, 3])
+    cnt.most_common(2)  # [(3, 3), (2, 2)]
+    cnt.most_common()  # [(3, 3), (2, 2), (1, 1)]
+
+elements()
+  - Returns iterator of elements repeating each as many times as count
+  - Time: O(sum(counts))
+  Usage:
+    cnt = Counter([1, 2, 2, 3, 3, 3])
+    list(cnt.elements())  # [1, 2, 2, 3, 3, 3]
+
+update(iterable/mapping)
+  - Adds counts from iterable or mapping
+  - Time: O(len(iterable))
+  Usage:
+    cnt = Counter([1, 2, 2])
+    cnt.update([2, 3, 3, 3])  # {1: 1, 2: 3, 3: 3}
+    cnt.update({'a': 5})  # Add from dict
+
+subtract(iterable/mapping)
+  - Subtracts counts
+  - Can result in zero or negative counts
+  - Time: O(len(iterable))
+  Usage:
+    cnt = Counter([1, 2, 2, 3, 3, 3])
+    cnt.subtract([2, 3])  # {1: 1, 2: 1, 3: 2}
+
+clear()
+  - Removes all elements
+  Usage:
+    cnt = Counter([1, 2, 3])
+    cnt.clear()  # Counter()
+
+copy()
+  - Creates shallow copy
+  Usage:
+    cnt1 = Counter([1, 2, 2])
+    cnt2 = cnt1.copy()
+
+Direct access:
+  cnt['x']  - Returns 0 if 'x' not present (unlike dict)
+  cnt[x] += 1  - Safe way to increment count
+
+Arithmetic operations:
+  cnt1 + cnt2  - Add counts (union)
+  cnt1 - cnt2  - Subtract counts (keeping only positive)
+  cnt1 & cnt2  - Intersection (minimum counts)
+  cnt1 | cnt2  - Union (maximum counts)
+
+C. DEFAULTDICT
+- Dictionary that creates default values for missing keys
+
+Methods:
+
+All dict methods (keys, values, items, get, pop, update, etc.)
+
+Special behavior:
+  - Automatically calls default_factory when accessing missing key
+  - Time: O(1) for insertion of new key
+  Usage:
+    from collections import defaultdict
+    dd = defaultdict(int)
+    dd['x'] += 1  # 'x' defaults to 0, then incremented to 1
+    dd['y']  # returns 0
+    
+    dd = defaultdict(list)
+    dd['a'].append(1)  # 'a' defaults to empty list
+    dd['b'].extend([2, 3])  # 'b' defaults to empty list
+    
+    dd = defaultdict(lambda: 'N/A')
+    dd['key']  # returns 'N/A'
+
+D. ORDEREDDICT
+- Dictionary that remembers insertion order
+- (Note: Regular dict also preserves order in Python 3.7+)
+
+Methods:
+
+All dict methods plus:
+
+move_to_end(key, last=True)
+  - Moves key to end (last=True) or beginning (last=False)
+  - Raises KeyError if key not found
+  - Time: O(1)
+  Usage:
+    from collections import OrderedDict
+    od = OrderedDict([('a', 1), ('b', 2), ('c', 3)])
+    od.move_to_end('a')  # a moves to end: b, c, a
+    od.move_to_end('b', last=False)  # b moves to beginning: b, c, a
+
+Use case:
+  - LRU Cache implementation
+  - When you explicitly need insertion order guarantee
+
+E. NAMEDTUPLE
+- Factory for creating tuple subclasses with named fields
+
+Creation:
   Point = namedtuple('Point', 'x y')
+  Point = namedtuple('Point', ['x', 'y'])
+  Point = namedtuple('Point', 'x y z', defaults=[0, 0])  # Python 3.7+
 
-6. Heapq Module
-- Provides heap queue (priority queue) algorithms.
-- Functions: heappush, heappop, heapify, heappushpop, heapreplace, nlargest, nsmallest
-Example:
-  import heapq
-  heap = [3, 1, 4]
-  heapq.heapify(heap)
-  heapq.heappush(heap, 2)
-  smallest = heapq.heappop(heap)
+Methods:
 
-7. Queue Module
-- Provides FIFO queue (queue.Queue), LIFO queue (queue.LifoQueue), and PriorityQueue (queue.PriorityQueue)
-Example:
-  from queue import Queue, LifoQueue, PriorityQueue
-  q = Queue()
-  q.put(1)
-  q.get()
+_make(iterable)
+  - Creates instance from iterable
+  - Time: O(1)
+  Usage:
+    Point = namedtuple('Point', 'x y')
+    p = Point._make([1, 2])  # Point(x=1, y=2)
 
-8. Array Module
-- Efficient arrays of basic values (array.array)
-Example:
+_asdict()
+  - Returns OrderedDict of field names to values
+  - Time: O(1)
+  Usage:
+    p = Point(1, 2)
+    d = p._asdict()  # OrderedDict([('x', 1), ('y', 2)])
+
+_replace(**kwargs)
+  - Returns new instance with specified fields replaced
+  - Time: O(number of fields)
+  Usage:
+    p = Point(1, 2)
+    p2 = p._replace(x=10)  # Point(x=10, y=2)
+
+_fields
+  - Class attribute: tuple of field names
+  Usage:
+    Point._fields  # ('x', 'y')
+
+Access methods:
+  p.x  - Access by attribute name
+  p[0]  - Access by index
+  p.x, p.y = 1, 2  - Tuple unpacking works
+
+Use case:
+  - Lightweight class alternative
+  - Return multiple values from function
+  - Use as dictionary keys (hashable)
+
+---
+
+6. HEAPQ MODULE
+- Implements min-heap (binary heap)
+- All functions assume 0-indexed min-heap where parent < children
+- Time: O(log n) for push/pop, O(n) for heapify
+
+Functions:
+
+heappush(heap, item)
+  - Adds item to heap maintaining heap property
+  - Time: O(log n)
+  Usage:
+    import heapq
+    heap = []
+    heapq.heappush(heap, 5)
+    heapq.heappush(heap, 2)
+    heapq.heappush(heap, 8)  # heap = [2, 5, 8]
+
+heappop(heap)
+  - Removes and returns smallest element
+  - Raises IndexError if heap is empty
+  - Time: O(log n)
+  Usage:
+    heap = [2, 5, 8]
+    val = heapq.heappop(heap)  # 2, heap = [5, 8]
+
+heappushpop(heap, item)
+  - Adds item and removes smallest element
+  - Equivalent to heappush then heappop but more efficient
+  - Time: O(log n)
+  Usage:
+    heap = [2, 5, 8]
+    val = heapq.heappushpop(heap, 3)  # 2, heap = [3, 5, 8]
+
+heapreplace(heap, item)
+  - Removes smallest element and adds item
+  - Faster than heappop then heappush
+  - Raises IndexError if heap is empty
+  - Time: O(log n)
+  Usage:
+    heap = [2, 5, 8]
+    val = heapreplace(heap, 1)  # 2, heap = [1, 5, 8]
+
+heapify(list)
+  - Transforms list into heap, in-place
+  - Time: O(n)
+  Usage:
+    arr = [3, 1, 4, 1, 5, 9, 2]
+    heapq.heapify(arr)  # arr = [1, 1, 4, 3, 5, 9, 2]
+
+nlargest(n, iterable, key=None)
+  - Returns n largest elements
+  - Time: O(n log k) where k = len(iterable)
+  Usage:
+    arr = [1, 5, 3, 9, 2]
+    heapq.nlargest(3, arr)  # [9, 5, 3]
+    heapq.nlargest(2, arr, key=lambda x: -x)  # 2 smallest
+
+nsmallest(n, iterable, key=None)
+  - Returns n smallest elements
+  - Time: O(n log k)
+  Usage:
+    arr = [1, 5, 3, 9, 2]
+    heapq.nsmallest(3, arr)  # [1, 2, 3]
+
+heappop/heappush operations:
+  Sorting array using heap:
+    import heapq
+    arr = [3, 1, 4, 1, 5]
+    heapq.heapify(arr)
+    sorted_arr = []
+    while arr:
+        sorted_arr.append(heapq.heappop(arr))
+    # sorted_arr = [1, 1, 3, 4, 5]
+
+Max-heap workaround (heapq only supports min-heap):
+  Push negative values: heapq.heappush(heap, -val)
+  Or use tuples: heapq.heappush(heap, (-val, item))
+
+Priority Queue with heap:
+  heap = []
+  heapq.heappush(heap, (priority, item))
+  priority, item = heapq.heappop(heap)
+
+---
+
+7. QUEUE MODULE
+- Thread-safe queue implementations
+
+A. QUEUE (FIFO - First In First Out)
+
+Methods:
+
+put(item, block=True, timeout=None)
+  - Adds item to queue
+  - Blocks if queue is full (only if maxsize > 0)
+  - Time: O(1)
+  Usage:
+    from queue import Queue
+    q = Queue(maxsize=2)
+    q.put(1)
+    q.put(2)
+    q.put(3, timeout=1)  # Blocks or raises Full
+
+get(block=True, timeout=None)
+  - Removes and returns item from queue
+  - Blocks if queue is empty
+  - Time: O(1)
+  Usage:
+    q = Queue()
+    q.put(1)
+    q.put(2)
+    val = q.get()  # 1
+    val = q.get(timeout=2)  # Waits up to 2 seconds
+
+qsize()
+  - Returns approximate size of queue
+  Usage:
+    sz = q.qsize()
+
+full()
+  - Returns True if queue is full
+  Usage:
+    if not q.full():
+        q.put(item)
+
+empty()
+  - Returns True if queue is empty
+  Usage:
+    if not q.empty():
+        item = q.get()
+
+B. LIFOQUEUE (LIFO - Last In First Out / Stack)
+
+Same methods as Queue but LIFO:
+  from queue import LifoQueue
+  stack = LifoQueue()
+  stack.put(1)
+  stack.put(2)
+  val = stack.get()  # 2 (last added)
+
+C. PRIORITYQUEUE
+
+put(item, block=True, timeout=None)
+  - item should be (priority, data) tuple
+  - Lower priority values retrieved first
+  Usage:
+    from queue import PriorityQueue
+    pq = PriorityQueue()
+    pq.put((1, 'high'))
+    pq.put((5, 'low'))
+    pq.put((3, 'medium'))
+    priority, data = pq.get()  # (1, 'high')
+
+get(block=True, timeout=None)
+  - Removes and returns item with lowest priority
+  Usage:
+    priority, data = pq.get()
+
+For non-comparable items in PriorityQueue:
+  pq.put((priority, counter, item))
+  where counter is used to break ties
+
+---
+
+8. ARRAY MODULE
+- Efficient arrays of basic values
+- Type code specifies element type
+
+Methods:
+
+append(x)
+  - Adds item to array
+  - Time: O(1) amortized
+
+extend(iterable)
+  - Extends array with items from iterable
+  - Time: O(k)
+
+insert(index, x)
+  - Inserts item at index
+  - Time: O(n)
+
+pop(index=-1)
+  - Removes and returns item at index
+  - Time: O(n) or O(1) with appropriate index
+
+remove(x)
+  - Removes first occurrence of x
+  - Time: O(n)
+
+reverse()
+  - Reverses array in-place
+  - Time: O(n)
+
+Usage:
   from array import array
-  arr = array('i', [1, 2, 3])
+  arr = array('i', [1, 2, 3])  # 'i' = signed integer
+  arr.append(4)
+  arr.extend([5, 6])
+  arr.pop()  # 6
 
-9. String Functions
-- Common methods: split, join, find, replace, upper, lower, strip, startswith, endswith
-Example:
-  s = 'hello world'
-  s2 = s.replace('world', 'python')
+Common type codes:
+  'b': signed byte
+  'i': signed integer
+  'f': float
+  'd': double
 
-10. Built-in Functions Useful for DSA
-- len, min, max, sum, sorted, reversed, enumerate, zip, map, filter, any, all, range, list, set, dict, tuple
-Example:
-  arr = [1, 2, 3]
-  for i, val in enumerate(arr):
-      print(i, val)
+---
 
-11. Itertools Module
-- Functions for efficient looping: product, permutations, combinations, combinations_with_replacement, accumulate, groupby, cycle, repeat, chain
-Example:
-  from itertools import permutations, combinations, product, accumulate
-  perms = list(permutations([1,2,3]))
-  combs = list(combinations([1,2,3], 2))
+9. STRING OPERATIONS
 
-12. Bisect Module
-- Functions for binary search: bisect_left, bisect_right, insort_left, insort_right
-Example:
-  import bisect
-  arr = [1, 2, 4, 5]
-  bisect.insort(arr, 3)
+Methods:
 
-13. Math Module
-- Functions: gcd, lcm, factorial, sqrt, ceil, floor, pow, log, comb, perm
-Example:
-  import math
-  math.gcd(12, 18)
-  math.comb(5, 2)
+split(sep=None, maxsplit=-1)
+  - Splits string into list
+  - If sep is None, splits by whitespace
+  - Time: O(n)
+  Usage:
+    s = "hello world python"
+    s.split()  # ['hello', 'world', 'python']
+    s.split(' ', 1)  # ['hello', 'world python']
 
-14. Random Module
-- Functions: randint, randrange, choice, shuffle, sample
-Example:
-  import random
-  random.shuffle(arr)
+join(iterable)
+  - Joins iterable with string as separator
+  - Time: O(sum of string lengths)
+  Usage:
+    words = ['hello', 'world']
+    ' '.join(words)  # 'hello world'
+    ''.join(words)  # 'helloworld'
 
-15. Time and Performance
-- time module for timing code (time.time, time.perf_counter)
-- functools.lru_cache for memoization
-Example:
-  from functools import lru_cache
-  @lru_cache(maxsize=None)
-  def fib(n):
-      if n < 2: return n
-      return fib(n-1) + fib(n-2)
+find(sub, start=0, end=len(string))
+  - Returns lowest index of substring (or -1 if not found)
+  - Time: O(n*m) worst case
+  Usage:
+    s = "hello world"
+    s.find("world")  # 6
+    s.find("xyz")  # -1
 
-For more, see Python's official documentation and the standard library reference.
+replace(old, new, count=-1)
+  - Returns string with old replaced by new
+  - count limits replacements
+  - Time: O(n)
+  Usage:
+    s = "hello world world"
+    s.replace("world", "python")  # "hello python python"
+    s.replace("world", "python", 1)  # "hello python world"
+
+upper()
+  - Returns uppercase version
+  Usage:
+    "hello".upper()  # "HELLO"
+
+lower()
+  - Returns lowercase version
+  Usage:
+    "HELLO".lower()  # "hello"
+
+strip(chars=None)
+  - Removes leading/trailing characters
+  - Default removes whitespace
+  Usage:
+    "  hello  ".strip()  # "hello"
+    "###hello###".strip('#')  # "hello"
+
+startswith(prefix, start=0, end=len(string))
+  - Returns True if starts with prefix
+  - Time: O(m) where m = len(prefix)
+  Usage:
+    "hello".startswith("he")  # True
+
+endswith(suffix, start=0, end=len(string))
+  - Returns True if ends with suffix
+  - Time: O(m)
+  Usage:
+    "hello".endswith("lo")  # True
+
+isdigit(), isalpha(), isalnum()
+  - Check character types
+  Usage:
+    "123".isdigit()  # True
+    "abc".isalpha()  # True
+
+---
+
+10. BUILT-IN FUNCTIONS FOR DSA
+
+len(obj)
+  - Returns length of object
+  - Time: O(1)
+  Usage:
+    len([1, 2, 3])  # 3
+    len("hello")  # 5
+
+min(*args, key=None)
+  - Returns smallest item
+  - Time: O(n)
+  Usage:
+    min([3, 1, 4, 1])  # 1
+    min('hello', 'world')  # 'hello'
+    min([3, 1, 4], key=lambda x: -x)  # 4
+
+max(*args, key=None)
+  - Returns largest item
+  - Time: O(n)
+  Usage:
+    max([3, 1, 4, 1])  # 4
+    max('hello', 'world')  # 'world'
+
+sum(iterable, start=0)
+  - Returns sum of items
+  - Time: O(n)
+  Usage:
+    sum([1, 2, 3])  # 6
+    sum([1, 2, 3], 10)  # 16
+
+sorted(iterable, key=None, reverse=False)
+  - Returns new sorted list
+  - Time: O(n log n)
+  Usage:
+    sorted([3, 1, 4, 1])  # [1, 1, 3, 4]
+    sorted(['a', 'bb', 'ccc'], key=len)  # ['a', 'bb', 'ccc']
+    sorted([3, 1, 4], reverse=True)  # [4, 3, 1]
+
+reversed(seq)
+  - Returns reverse iterator
+  - Time: O(1) for iterator creation
+  Usage:
+    list(reversed([1, 2, 3]))  # [3, 2, 1]
+    for item in reversed(range(5)):
+        print(item)  # 4, 3, 2, 1, 0
+
+enumerate(iterable, start=0)
+  - Returns pairs of (index, value)
+  - Time: O(n)
+  Usage:
+    for i, val in enumerate(['a', 'b', 'c']):
+        print(i, val)  # 0 a, 1 b, 2 c
+    for i, val in enumerate(['a', 'b'], start=1):
+        print(i, val)  # 1 a, 2 b
+
+zip(*iterables)
+  - Combines iterables element-wise
+  - Time: O(min(len(iterables)))
+  Usage:
+    list(zip([1, 2], ['a', 'b']))  # [(1, 'a'), (2, 'b')]
+    for a, b, c in zip([1, 2], ['x', 'y'], [True, False]):
+        print(a, b, c)
+
+map(func, *iterables)
+  - Applies func to all items
+  - Returns iterator
+  - Time: O(n)
+  Usage:
+    list(map(str, [1, 2, 3]))  # ['1', '2', '3']
+    list(map(lambda x: x*2, [1, 2, 3]))  # [2, 4, 6]
+
+filter(func, iterable)
+  - Filters items where func returns True
+  - Returns iterator
+  - Time: O(n)
+  Usage:
+    list(filter(lambda x: x > 2, [1, 2, 3, 4]))  # [3, 4]
+
+any(iterable)
+  - Returns True if any item is truthy
+  - Time: O(n) worst case, O(1) best case
+  Usage:
+    any([False, False, True])  # True
+    any([0, '', None])  # False
+
+all(iterable)
+  - Returns True if all items are truthy
+  - Time: O(n) worst case
+  Usage:
+    all([True, True, 1])  # True
+    all([True, False, 1])  # False
+
+range(start, stop, step)
+  - Creates range of numbers
+  - Does not create list, returns iterator
+  - Time: O(1) for access
+  Usage:
+    list(range(5))  # [0, 1, 2, 3, 4]
+    list(range(1, 5))  # [1, 2, 3, 4]
+    list(range(0, 10, 2))  # [0, 2, 4, 6, 8]
+
+list(iterable)
+  - Converts to list
+  - Time: O(n)
+  Usage:
+    list(range(3))  # [0, 1, 2]
+    list("abc")  # ['a', 'b', 'c']
+
+set(iterable)
+  - Converts to set
+  - Time: O(n)
+  Usage:
+    set([1, 2, 2, 3])  # {1, 2, 3}
+
+dict(iterable or **kwargs)
+  - Converts to dictionary
+  - Time: O(n)
+  Usage:
+    dict([('a', 1), ('b', 2)])  # {'a': 1, 'b': 2}
+    dict(a=1, b=2)  # {'a': 1, 'b': 2}
+
+tuple(iterable)
+  - Converts to tuple
+  - Time: O(n)
+  Usage:
+    tuple([1, 2, 3])  # (1, 2, 3)
+
+---
+
+11. ITERTOOLS MODULE
+- Iterator building blocks
+
+Functions:
+
+product(*iterables, repeat=1)
+  - Cartesian product
+  - Time: O(n^k) for k iterables of size n
+  Usage:
+    from itertools import product
+    list(product([1, 2], ['a', 'b']))
+    # [(1, 'a'), (1, 'b'), (2, 'a'), (2, 'b')]
+    list(product([1, 2], repeat=2))
+    # [(1, 1), (1, 2), (2, 1), (2, 2)]
+
+permutations(iterable, r=None)
+  - All r-length permutations
+  - Time: O(n! / (n-r)!)
+  Usage:
+    from itertools import permutations
+    list(permutations([1, 2, 3]))
+    # [(1,2,3), (1,3,2), (2,1,3), (2,3,1), (3,1,2), (3,2,1)]
+    list(permutations([1, 2, 3], 2))
+    # [(1,2), (1,3), (2,1), (2,3), (3,1), (3,2)]
+
+combinations(iterable, r)
+  - All r-length combinations without replacement
+  - Time: O(C(n, r))
+  Usage:
+    from itertools import combinations
+    list(combinations([1, 2, 3], 2))
+    # [(1, 2), (1, 3), (2, 3)]
+
+combinations_with_replacement(iterable, r)
+  - All r-length combinations with replacement
+  - Time: O(C(n+r-1, r))
+  Usage:
+    list(combinations_with_replacement([1, 2, 3], 2))
+    # [(1,1), (1,2), (1,3), (2,2), (2,3), (3,3)]
+
+accumulate(iterable, func=operator.add, initial=None)
+  - Running total/accumulation
+  - Time: O(n)
+  Usage:
+    from itertools import accumulate
+    list(accumulate([1, 2, 3, 4]))  # [1, 3, 6, 10]
+    list(accumulate([1, 2, 3], func=lambda x,y: x*y))  # [1, 2, 6]
+
+groupby(iterable, key=None)
+  - Groups consecutive elements
+  - Input should be sorted by key
+  - Time: O(n)
+  Usage:
+    from itertools import groupby
+    groups = groupby([1, 1, 2, 2, 3])
+    for key, group in groups:
+        print(key, list(group))
+    # 1 [1, 1]
+    # 2 [2, 2]
+    # 3 [3]
+
+cycle(iterable)
+  - Cycles through iterable indefinitely
+  Usage:
+    from itertools import cycle
+    cyc = cycle([1, 2, 3])
+    [next(cyc) for _ in range(7)]  # [1, 2, 3, 1, 2, 3, 1]
+
+repeat(object, times=None)
+  - Repeats object indefinitely or n times
+  Usage:
+    from itertools import repeat
+    list(repeat(5, 3))  # [5, 5, 5]
+
+chain(*iterables)
+  - Chains iterables together
+  - Time: O(sum of lengths)
+  Usage:
+    from itertools import chain
+    list(chain([1, 2], [3, 4], [5]))  # [1, 2, 3, 4, 5]
+
+---
+
+12. BISECT MODULE
+- Binary search on sorted lists
+
+Functions:
+
+bisect_left(a, x, lo=0, hi=len(a))
+  - Leftmost insertion point for x in a
+  - Returns index where x would be inserted to keep list sorted
+  - Time: O(log n)
+  Usage:
+    import bisect
+    arr = [1, 2, 4, 5]
+    idx = bisect.bisect_left(arr, 3)  # 2
+    idx = bisect.bisect_left(arr, 2)  # 1 (leftmost position)
+
+bisect_right(a, x, lo=0, hi=len(a))
+  - Rightmost insertion point for x in a
+  - Time: O(log n)
+  Usage:
+    arr = [1, 2, 2, 4, 5]
+    idx = bisect.bisect_right(arr, 2)  # 3 (rightmost position)
+    idx = bisect.bisect_right(arr, 3)  # 3
+
+insort_left(a, x, lo=0, hi=len(a))
+  - Inserts x into a keeping sorted (leftmost)
+  - Modifies list in-place
+  - Time: O(n) due to insertion, O(log n) for search
+  Usage:
+    arr = [1, 2, 4, 5]
+    bisect.insort_left(arr, 3)  # arr = [1, 2, 3, 4, 5]
+
+insort_right(a, x, lo=0, hi=len(a))
+  - Inserts x into a keeping sorted (rightmost)
+  - Time: O(n)
+  Usage:
+    arr = [1, 2, 2, 4, 5]
+    bisect.insort_right(arr, 2)  # arr = [1, 2, 2, 2, 4, 5]
+
+Use cases:
+  # Find range of values equal to x
+  left = bisect.bisect_left(arr, x)
+  right = bisect.bisect_right(arr, x)
+  count = right - left
+
+---
+
+13. MATH MODULE
+- Mathematical functions
+
+Functions:
+
+gcd(*integers)
+  - Greatest common divisor
+  - Time: O(log(min(a, b)))
+  Usage:
+    import math
+    math.gcd(12, 18)  # 6
+    math.gcd(12, 18, 24)  # 6 (multiple args)
+
+lcm(*integers)
+  - Least common multiple (Python 3.9+)
+  Usage:
+    math.lcm(12, 18)  # 36
+
+factorial(n)
+  - n! = n × (n-1) × ... × 1
+  - Raises ValueError for negative n
+  - Time: O(n)
+  Usage:
+    math.factorial(5)  # 120
+
+sqrt(x)
+  - Square root
+  Usage:
+    math.sqrt(16)  # 4.0
+
+ceil(x)
+  - Rounds up to nearest integer
+  Usage:
+    math.ceil(4.2)  # 5
+
+floor(x)
+  - Rounds down to nearest integer
+  Usage:
+    math.floor(4.8)  # 4
+
+pow(base, exp, mod=None)
+  - base^exp or (base^exp) % mod
+  - Modular exponentiation when mod provided
+  - Time: O(log exp)
+  Usage:
+    math.pow(2, 10)  # 1024.0
+    pow(2, 1000, 1000000007)  # (2^1000) % 1000000007
+
+log(x, base=e)
+  - Logarithm
+  Usage:
+    math.log(8, 2)  # 3.0 (log base 2)
+    math.log(100, 10)  # 2.0
+
+comb(n, k)  - Python 3.8+
+  - Binomial coefficient C(n, k) = n! / (k! × (n-k)!)
+  - Time: O(min(k, n-k))
+  Usage:
+    math.comb(5, 2)  # 10
+
+perm(n, k)  - Python 3.8+
+  - Permutation P(n, k) = n! / (n-k)!
+  Usage:
+    math.perm(5, 2)  # 20
+
+Constants:
+  math.pi  # 3.14159...
+  math.e  # 2.71828...
+  math.inf  # Infinity
+  math.tau  # 2π
+
+---
+
+14. RANDOM MODULE
+- Pseudo-random number generation
+
+Functions:
+
+randint(a, b)
+  - Returns random integer in [a, b] (inclusive)
+  Usage:
+    import random
+    random.randint(1, 10)  # Random int from 1 to 10
+
+randrange(start, stop, step)
+  - Like range() but returns random element
+  - Raises ValueError if range is empty
+  Usage:
+    random.randrange(0, 10)  # Random int from 0 to 9
+    random.randrange(0, 100, 2)  # Random even int from 0 to 98
+
+choice(seq)
+  - Returns random element from non-empty sequence
+  - Raises IndexError if seq is empty
+  Usage:
+    random.choice([1, 2, 3, 4, 5])
+    random.choice('abcde')
+
+shuffle(list)
+  - Shuffles list in-place
+  - Time: O(n)
+  Usage:
+    arr = [1, 2, 3, 4, 5]
+    random.shuffle(arr)  # arr shuffled
+
+sample(population, k)
+  - Returns k unique elements from population
+  - Raises ValueError if k > len(population)
+  - Time: O(k)
+  Usage:
+    random.sample([1, 2, 3, 4, 5], 3)  # 3 unique elements
+
+uniform(a, b)
+  - Returns random float in [a, b]
+  Usage:
+    random.uniform(1.0, 10.0)
+
+seed(a=None)
+  - Sets random seed for reproducibility
+  Usage:
+    random.seed(42)
+    random.randint(1, 100)  # Same result every run with seed 42
+
+---
+
+15. TIME AND PERFORMANCE
+
+time module:
+
+time.time()
+  - Returns current time in seconds since epoch
+  - Low resolution
+  Usage:
+    import time
+    start = time.time()
+    # ... code ...
+    elapsed = time.time() - start
+
+time.perf_counter()
+  - Returns performance counter (high resolution)
+  - Best for measuring elapsed time
+  Usage:
+    start = time.perf_counter()
+    # ... code ...
+    elapsed = time.perf_counter() - start
+
+functools.lru_cache decorator:
+
+@lru_cache(maxsize=128)
+  - Caches function results based on arguments
+  - maxsize: max cached results (None = unlimited)
+  - Requires arguments to be hashable
+  - Time: O(1) for cached calls
+  Usage:
+    from functools import lru_cache
+    
+    @lru_cache(maxsize=None)
+    def fibonacci(n):
+        if n < 2:
+            return n
+        return fibonacci(n-1) + fibonacci(n-2)
+    
+    fibonacci(30)  # Fast with memoization
+    
+    @lru_cache(maxsize=256)
+    def expensive_func(x, y):
+        return x ** y
+    
+    expensive_func.cache_info()  # Check cache statistics
+    expensive_func.cache_clear()  # Clear cache
+
+Other caching decorators:
+  @cache (Python 3.9+) - Unlimited size, simpler
+  Usage:
+    from functools import cache
+    
+    @cache
+    def fib(n):
+        if n < 2:
+            return n
+        return fib(n-1) + fib(n-2)
+
+---
+
+SUMMARY OF TIME COMPLEXITIES
+
+Data Structure Access Insert Delete Search
+List          O(1)   O(n)   O(n)   O(n)
+Tuple         O(1)   N/A    N/A    O(n)
+Set           O(1)   O(1)   O(1)   O(1)
+Dictionary    O(1)   O(1)   O(1)   O(1)
+Deque         O(1)   O(1)   O(1)   O(n)
+Heap          O(1)   O(logn) O(logn) O(n)
+
+---
+
+COMMON PATTERNS
+
+1. Count elements: Counter or defaultdict(int)
+2. Group elements: defaultdict(list) or groupby
+3. Order by frequency: Counter.most_common()
+4. BFS/Priority: deque or heapq
+5. Check duplicates: set
+6. Fast lookup: dict or set
+7. Sorted access: heapq or bisect
+8. Sliding window: deque
+9. Multi-key sort: sorted with key function
+10. Memoization: lru_cache decorator
+
+---
+
+For more information, see Python's official documentation:
+https://docs.python.org/3/library/

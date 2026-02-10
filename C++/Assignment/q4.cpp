@@ -9,10 +9,10 @@ class Employee
 
 public:
     // Getter
-    int getEmpId() { return this->empID; }
-    string getEmpName() { return this->empName; }
-    double getEmpSalary() { return this->empSalary; }
-    double getGrossSalary() { return this->grossSalary; }
+    int getEmpId() const { return this->empID; }
+    string getEmpName() const { return this->empName; }
+    double getEmpSalary() const { return this->empSalary; }
+    double getGrossSalary() const { return this->grossSalary; }
 
     // Setter
     void setEmpId(int id) { this->empID = id; }
@@ -81,11 +81,38 @@ void Employee::updateData()
 int main(){
 
     Employee e[5];
+    int input;
+    do
+    {
+        cout << "\nMenu:" << endl;
+        cout << "1. Accept Info: " << endl;
+        cout << "2. Display Info: " << endl;
+        cout << "3. Calculate Grade: " << endl;
+        cout << "4. Exit" << endl;
+        cout << "Enter the choice: ";
+        cin >> input;
+        cout << endl;
 
-    e.addEmployee();
-    e.displayEmployeeDetails();
-    e.updateData();
-    e.calculateGrossSalary();
-    e.displayEmployeeDetails();
-    return 0;
+        switch (input)
+        {
+        case 1:
+            s.aInfo();
+            break;
+        case 2:
+            s.dInfo();
+            break;
+        case 3:
+            cout << "Grade: " << s.calcGrade() << endl;
+            break;
+        case 4:
+            cout << "Exiting.." << endl;
+            break;
+
+        default:
+            cout << "Invalid input!" << endl;
+            break;
+        }
+    } while (input != 4);
+
+    
 }

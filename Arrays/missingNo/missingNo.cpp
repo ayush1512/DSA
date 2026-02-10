@@ -16,5 +16,5 @@ int main()
         sum+=i;
         arr_sum+=arr[i];
     }
-    cout << sum-arr_sum;
+    cout << arr_sum-sum;
 }

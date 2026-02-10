@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python DSA Reference</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #334155;
+    --border: #475569;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --green: #4ade80;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --orange: #fb923c;
+    --pink: #f472b6;
+    --code-bg: #0d1117;
+    --sidebar-w: 280px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 16px;
+    padding: 0 24px; height: 64px;
+  }
+  .topbar .logo {
+    font-size: 1.25rem; font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    white-space: nowrap;
+  }
+  .topbar .logo span { font-weight: 400; opacity: .7; -webkit-text-fill-color: var(--text-muted); }
+
+  .search-box {
+    flex: 1; max-width: 520px; position: relative;
+  }
+  .search-box input {
+    width: 100%; padding: 10px 16px 10px 42px;
+    border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text);
+    font-size: .95rem; outline: none; transition: .2s;
+  }
+  .search-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56,189,248,.15); }
+  .search-box .icon {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); pointer-events: none;
+  }
+  .search-box .shortcut {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    font-size: .7rem; color: var(--text-muted); background: var(--surface2);
+    padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border);
+  }
+
+  .hamburger {
+    display: none; background: none; border: none; color: var(--text);
+    font-size: 1.5rem; cursor: pointer; padding: 4px;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed; top: 64px; left: 0; bottom: 0;
+    width: var(--sidebar-w); background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto; padding: 16px 0; z-index: 90;
+    transition: transform .3s;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .sidebar .nav-group { margin-bottom: 8px; }
+  .sidebar .nav-group-title {
+    padding: 8px 20px; font-size: .7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .1em; color: var(--text-muted);
+  }
+  .sidebar a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 20px; color: var(--text-muted);
+    text-decoration: none; font-size: .88rem;
+    border-left: 3px solid transparent; transition: .15s;
+  }
+  .sidebar a:hover { background: var(--surface2); color: var(--text); }
+  .sidebar a.active { border-left-color: var(--accent); color: var(--accent); background: rgba(56,189,248,.08); }
+  .sidebar .nav-icon { font-size: 1.1rem; width: 22px; text-align: center; }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: var(--sidebar-w); margin-top: 64px;
+    padding: 32px 40px 80px;
+    max-width: 960px;
+  }
+
+  /* ── SECTIONS ── */
+  .section { margin-bottom: 48px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px; padding-bottom: 12px;
+    border-bottom: 2px solid var(--surface2);
+  }
+  .section-header .num {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; font-weight: 700; font-size: .85rem;
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .section-header h2 { font-size: 1.5rem; font-weight: 700; }
+  .section-header .badge {
+    font-size: .7rem; padding: 3px 10px; border-radius: 20px;
+    background: var(--surface2); color: var(--text-muted); margin-left: auto; white-space: nowrap;
+  }
+
+  .desc {
+    background: var(--surface); border-radius: 10px;
+    padding: 14px 18px; margin-bottom: 20px;
+    border-left: 4px solid var(--accent);
+    color: var(--text-muted); font-size: .92rem;
+  }
+  .desc strong { color: var(--text); }
+
+  /* ── METHOD CARDS ── */
+  .method-card {
+    background: var(--surface); border-radius: 12px;
+    border: 1px solid var(--surface2);
+    margin-bottom: 14px; overflow: hidden;
+    transition: border-color .2s;
+  }
+  .method-card:hover { border-color: var(--border); }
+  .method-card.open .card-body { display: block; }
+  .method-card.open .chevron { transform: rotate(90deg); }
+
+  .card-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 18px; cursor: pointer; user-select: none;
+  }
+  .card-head:hover { background: rgba(255,255,255,.02); }
+  .card-head .fn-name {
+    font-family: 'Fira Code', 'SF Mono', 'Cascadia Code', monospace;
+    font-size: .95rem; color: var(--green); font-weight: 600;
+  }
+  .card-head .fn-desc {
+    font-size: .82rem; color: var(--text-muted); flex: 1;
+  }
+  .card-head .complexity {
+    font-size: .7rem; padding: 2px 10px; border-radius: 20px;
+    font-weight: 600; white-space: nowrap;
+  }
+  .complexity.o1 { background: rgba(74,222,128,.12); color: var(--green); }
+  .complexity.ologn { background: rgba(251,191,36,.12); color: var(--yellow); }
+  .complexity.on { background: rgba(251,146,60,.12); color: var(--orange); }
+  .complexity.onlogn { background: rgba(248,113,113,.12); color: var(--red); }
+  .complexity.other { background: rgba(129,140,248,.12); color: var(--accent2); }
+  .chevron { color: var(--text-muted); transition: transform .2s; font-size: .8rem; }
+
+  .card-body { display: none; padding: 0 18px 16px; }
+  .card-body p { font-size: .88rem; color: var(--text-muted); margin-bottom: 8px; }
+  .card-body .note { color: var(--yellow); font-size: .82rem; }
+
+  pre {
+    background: var(--code-bg); border-radius: 8px;
+    padding: 14px 16px; overflow-x: auto;
+    font-family: 'Fira Code', 'SF Mono', 'Cascadia Code', monospace;
+    font-size: .82rem; line-height: 1.7;
+    border: 1px solid var(--surface2); margin-top: 8px;
+  }
+  pre .kw { color: var(--pink); }
+  pre .fn { color: var(--accent); }
+  pre .str { color: var(--green); }
+  pre .num { color: var(--orange); }
+  pre .cmt { color: var(--text-muted); font-style: italic; }
+  pre .op { color: var(--yellow); }
+
+  /* ── COMPLEXITY TABLE ── */
+  .complexity-table {
+    width: 100%; border-collapse: collapse;
+    background: var(--surface); border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--surface2);
+  }
+  .complexity-table th {
+    background: var(--surface2); padding: 12px 16px;
+    text-align: left; font-size: .8rem; text-transform: uppercase;
+    letter-spacing: .05em; color: var(--text-muted);
+  }
+  .complexity-table td {
+    padding: 10px 16px; border-top: 1px solid var(--surface2);
+    font-size: .88rem;
+  }
+  .complexity-table tr:hover td { background: rgba(255,255,255,.02); }
+  .complexity-table .ds-name { font-weight: 600; color: var(--accent); }
+
+  /* ── PATTERNS ── */
+  .pattern-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px;
+  }
+  .pattern-card {
+    background: var(--surface); border-radius: 10px;
+    padding: 16px; border: 1px solid var(--surface2);
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .pattern-card .p-num {
+    background: var(--surface2); width: 28px; height: 28px;
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: .8rem; color: var(--accent); flex-shrink: 0;
+  }
+  .pattern-card .p-text { font-size: .88rem; }
+  .pattern-card .p-text strong { color: var(--accent); }
+  .pattern-card code {
+    font-family: 'Fira Code', monospace; font-size: .8rem;
+    background: var(--code-bg); padding: 1px 6px; border-radius: 4px;
+    color: var(--green);
+  }
+
+  /* ── SEARCH RESULTS ── */
+  .search-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
+  }
+  .search-overlay.show { display: flex; justify-content: center; padding-top: 100px; }
+  .search-results {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; width: 580px; max-height: 60vh;
+    overflow-y: auto; padding: 8px;
+  }
+  .search-results .sr-item {
+    padding: 10px 14px; border-radius: 8px; cursor: pointer;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .search-results .sr-item:hover, .search-results .sr-item.active { background: var(--surface2); }
+  .search-results .sr-item .sr-title { font-weight: 600; font-size: .92rem; }
+  .search-results .sr-item .sr-section { font-size: .78rem; color: var(--text-muted); }
+  .search-results .sr-item mark { background: rgba(56,189,248,.25); color: var(--accent); border-radius: 2px; }
+  .search-results .sr-empty { padding: 24px; text-align: center; color: var(--text-muted); }
+
+  /* ── BACK TO TOP ── */
+  .btt {
+    position: fixed; bottom: 28px; right: 28px;
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--accent); color: var(--bg);
+    border: none; cursor: pointer; font-size: 1.2rem;
+    display: none; align-items: center; justify-content: center;
+    box-shadow: 0 4px 16px rgba(56,189,248,.3); transition: .2s; z-index: 50;
+  }
+  .btt:hover { transform: translateY(-2px); }
+  .btt.show { display: flex; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 840px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,.4); }
+    .main { margin-left: 0; padding: 24px 18px 60px; }
+    .hamburger { display: block; }
+    .topbar .logo span { display: none; }
+    .search-box .shortcut { display: none; }
+    .search-results { width: 95vw; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ TOP BAR ═══ -->
+<header class="topbar">
+  <button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Menu">☰</button>
+  <div class="logo">PyDSA<span> Reference</span></div>
+  <div class="search-box">
+    <span class="icon">🔍</span>
+    <input id="searchInput" type="text" placeholder="Search methods, modules, data structures…" autocomplete="off">
+    <span class="shortcut">Ctrl K</span>
+  </div>
+</header>
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar" id="sidebar">
+  <div class="nav-group">
+    <div class="nav-group-title">Data Structures</div>
+    <a href="#list"><span class="nav-icon">📋</span> List</a>
+    <a href="#tuple"><span class="nav-icon">📌</span> Tuple</a>
+    <a href="#set"><span class="nav-icon">🔘</span> Set</a>
+    <a href="#dict"><span class="nav-icon">🗂️</span> Dictionary</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Collections</div>
+    <a href="#deque"><span class="nav-icon">🔄</span> Deque</a>
+    <a href="#counter"><span class="nav-icon">🔢</span> Counter</a>
+    <a href="#defaultdict"><span class="nav-icon">📦</span> defaultdict</a>
+    <a href="#ordereddict"><span class="nav-icon">📑</span> OrderedDict</a>
+    <a href="#namedtuple"><span class="nav-icon">🏷️</span> namedtuple</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Modules</div>
+    <a href="#heapq"><span class="nav-icon">⛰️</span> heapq</a>
+    <a href="#queue"><span class="nav-icon">🚦</span> queue</a>
+    <a href="#array"><span class="nav-icon">🧮</span> array</a>
+    <a href="#string"><span class="nav-icon">🔤</span> Strings</a>
+    <a href="#builtins"><span class="nav-icon">⚡</span> Built-ins</a>
+    <a href="#itertools"><span class="nav-icon">🔁</span> itertools</a>
+    <a href="#bisect"><span class="nav-icon">🔍</span> bisect</a>
+    <a href="#math"><span class="nav-icon">📐</span> math</a>
+    <a href="#random"><span class="nav-icon">🎲</span> random</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Reference</div>
+    <a href="#performance"><span class="nav-icon">⏱️</span> Performance</a>
+    <a href="#complexity"><span class="nav-icon">📊</span> Complexity Table</a>
+    <a href="#patterns"><span class="nav-icon">💡</span> Common Patterns</a>
+  </div>
+</nav>
+
+<!-- ═══ SEARCH OVERLAY ═══ -->
+<div class="search-overlay" id="searchOverlay" onclick="if(event.target===this)closeSearch()">
+  <div class="search-results" id="searchResults"></div>
+</div>
+
+<!-- ═══ MAIN CONTENT ═══ -->
+<main class="main" id="content">
+
+<!-- ────── 1. LIST ────── -->
+<section class="section" id="list">
+  <div class="section-header">
+    <span class="num">1</span>
+    <h2>List</h2>
+    <span class="badge">Mutable · Ordered · Indexed</span>
+  </div>
+  <div class="desc">
+    Dynamic array supporting indexing, slicing, and mutation.
+    <strong>O(1)</strong> append, <strong>O(n)</strong> insert/remove at arbitrary positions.
+  </div>
+
+  <div class="method-card" data-search="append add end list">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">append(item)</span>
+      <span class="fn-desc">Add item to end</span>
+      <span class="complexity o1">O(1)</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="cmt"># Adds item to the end of the list</span>
+lst = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+lst.append(<span class="num">4</span>)  <span class="cmt"># [1, 2, 3, 4]</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="extend add iterable merge list">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">extend(iterable)</span>
+      <span class="fn-desc">Add all elements from iterable</span>
+      <span class="complexity on">O(k)</span>
+    </div>
+    <div class="card-body">
+      <pre>lst = [<span class="num">1</span>, <span class="num">2</span>]
+lst.extend([<span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>])  <span class="cmt"># [1, 2, 3, 4, 5]</span>
+lst.extend((<span class="num">6</span>, <span class="num">7</span>))      <span class="cmt"># [1, 2, 3, 4, 5, 6, 7]</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="insert index position list">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">insert(index, item)</span>
+      <span class="fn-desc">Insert item at index</span>
+      <span class="complexity on">O(n)</span>
+    </div>
+    <div class="card-body">
+      <p>Shifts elements to the right to make room.</p>
+      <pre>lst = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">4</span>]
+lst.insert(<span class="num">2</span>, <span class="num">3</span>)  <span class="cmt"># [1, 2, 3, 4]</span>
+lst.insert(<span class="num">0</span>, <span class="num">0</span>)  <span class="cmt"># [0, 1, 2, 3, 4]</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="remove delete first occurrence list">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">remove(item)</span>
+      <span class="fn-desc">Remove first occurrence</span>
+      <span class="complexity on">O(n)</span>
+    </div>
+    <div class="card-body">
+      <p class="note">⚠ Raises ValueError if item not found.</p>
+      <pre>lst = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">2</span>]
+lst.remove(<span class="num">2</span>)  <span class="cmt"># [1, 3, 2] — only first 2 removed</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="pop remove return last index list">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">pop(index=-1)</span>
+      <span class="fn-desc">Remove &amp; return item at index</span>
+      <span class="complexity o1">O(1) last / O(n)</span>
+    </div>
+    <div class="card-body">
+      <pre>lst = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+val = lst.pop()   <span class="cmt"># Returns 3, lst = [1, 2]</span>
+val = lst.pop(<span class="num">0</span>) <span class="cmt"># Returns 1, lst = [2]</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="clear empty remove all list">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">clear()</span>
+      <span class="fn-desc">Remove all items</span>
+      <span class="complexity on">O(n)</span>
+    </div>
+    <div class="card-body">
+      <pre>lst = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+lst.clear()  <span class="cmt"># []</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="index find position search list">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">index(item, start, end)</span>
+      <span class="fn-desc">Find index of first occurrence</span>
+      <span class="complexity on">O(n)</span>
+    </div>
+    <div class="card-body">
+      <p class="note">⚠ Raises ValueError if item not found.</p>
+      <pre>lst = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">2</span>]
+idx = lst.index(<span class="num">2</span>)     <span class="cmt"># 1</span>
+idx = lst.index(<span class="num">2</span>, <span class="num">2</span>)  <span class="cmt"># 3 (search from index 2)</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="count occurrences frequency list">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">count(item)</span>
+      <span class="fn-desc">Count occurrences</span>
+      <span class="complexity on">O(n)</span>
+    </div>
+    <div class="card-body">
+      <pre>lst = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">2</span>]
+cnt = lst.count(<span class="num">2</span>)  <span class="cmt"># 3</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="sort order ascending descending key list">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">sort(key=None, reverse=False)</span>
+      <span class="fn-desc">Sort in-place</span>
+      <span class="complexity onlogn">O(n log n)</span>
+    </div>
+    <div class="card-body">
+      <pre>lst = [<span class="num">3</span>, <span class="num">1</span>, <span class="num">4</span>, <span class="num">1</span>, <span class="num">5</span>]
+lst.sort()                <span class="cmt"># [1, 1, 3, 4, 5]</span>
+lst.sort(reverse=<span class="kw">True</span>)   <span class="cmt"># [5, 4, 3, 1, 1]</span>
+
+lst = [(<span class="str">'a'</span>, <span class="num">3</span>), (<span class="str">'b'</span>, <span class="num">1</span>), (<span class="str">'c'</span>, <span class="num">2</span>)]
+lst.sort(key=<span class="kw">lambda</span> x: x[<span class="num">1</span>])
+<span class="cmt"># [('b', 1), ('c', 2), ('a', 3)]</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="reverse flip invert list">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">reverse()</span>
+      <span class="fn-desc">Reverse in-place</span>
+      <span class="complexity on">O(n)</span>
+    </div>
+    <div class="card-body">
+      <pre>lst = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+lst.reverse()  <span class="cmt"># [3, 2, 1]</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="copy shallow clone list">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">copy()</span>
+      <span class="fn-desc">Shallow copy</span>
+      <span class="complexity on">O(n)</span>
+    </div>
+    <div class="card-body">
+      <pre>lst1 = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+lst2 = lst1.copy()  <span class="cmt"># [1, 2, 3]</span>
+lst2.append(<span class="num">4</span>)     <span class="cmt"># lst1 unchanged</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="slice slicing list access range step">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">Slicing [start:end:step]</span>
+      <span class="fn-desc">Get/set sub-sequence</span>
+      <span class="complexity on">O(k)</span>
+    </div>
+    <div class="card-body">
+      <pre>lst[<span class="num">1</span>:<span class="num">3</span>]   <span class="cmt"># Elements at index 1, 2</span>
+lst[::<span class="num">2</span>]   <span class="cmt"># Every 2nd element</span>
+lst[::-<span class="num">1</span>]  <span class="cmt"># Reversed copy</span>
+lst[<span class="num">1</span>:] = [x, y, z]  <span class="cmt"># Replace from index 1</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="list comprehension generator expression filter transform">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">&#9654;</span>
+      <span class="fn-name">List Comprehension</span>
+      <span class="fn-desc">Build lists with concise syntax</span>
+      <span class="complexity on">O(n)</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="cmt"># Basic comprehension</span>
+squares = [x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>)]  <span class="cmt"># [0, 1, 4, 9, 16]</span>
+
+<span class="cmt"># With condition</span>
+evens = [x <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>) <span class="kw">if</span> x % <span class="num">2</span> == <span class="num">0</span>]  <span class="cmt"># [0, 2, 4, 6, 8]</span>
+
+<span class="cmt"># Nested comprehension (2D)</span>
+matrix = [[<span class="num">0</span>] * <span class="num">3</span> <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="num">3</span>)]
+flat = [x <span class="kw">for</span> row <span class="kw">in</span> matrix <span class="kw">for</span> x <span class="kw">in</span> row]</pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="in membership contains list check">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">&#9654;</span>
+      <span class="fn-name">in / not in</span>
+      <span class="fn-desc">Membership test</span>
+      <span class="complexity on">O(n)</span>
+    </div>
+    <div class="card-body">
+      <pre>lst = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>]
+<span class="num">3</span> <span class="kw">in</span> lst      <span class="cmt"># True</span>
+<span class="num">5</span> <span class="kw">not in</span> lst  <span class="cmt"># True</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="concatenate repeat multiply add lists operator">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">&#9654;</span>
+      <span class="fn-name">+ (concat) / * (repeat)</span>
+      <span class="fn-desc">Concatenation and repetition</span>
+      <span class="complexity on">O(n+m) / O(n*k)</span>
+    </div>
+    <div class="card-body">
+      <pre>lst1 = [<span class="num">1</span>, <span class="num">2</span>] + [<span class="num">3</span>, <span class="num">4</span>]  <span class="cmt"># [1, 2, 3, 4]</span>
+lst2 = [<span class="num">0</span>] * <span class="num">5</span>             <span class="cmt"># [0, 0, 0, 0, 0]</span>
+
+<span class="cmt"># Caution: nested mutable objects share refs</span>
+bad = [[]] * <span class="num">3</span>   <span class="cmt"># 3 refs to SAME list!</span>
+good = [[] <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="num">3</span>)]  <span class="cmt"># 3 separate lists</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ────── 2. TUPLE ────── -->
+<section class="section" id="tuple">
+  <div class="section-header">
+    <span class="num">2</span>
+    <h2>Tuple</h2>
+    <span class="badge">Immutable · Ordered · Hashable</span>
+  </div>
+  <div class="desc">
+    Immutable sequence supporting indexing and slicing.
+    <strong>O(1)</strong> access, <strong>O(n)</strong> search. Use when data shouldn't change and for hashable keys.
+  </div>
+
+  <div class="method-card" data-search="index find position search tuple">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">index(item, start, end)</span>
+      <span class="fn-desc">Find first occurrence index</span>
+      <span class="complexity on">O(n)</span>
+    </div>
+    <div class="card-body">
+      <pre>t = (<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">2</span>)
+idx = t.index(<span class="num">2</span>)  <span class="cmt"># 1</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="count occurrences frequency tuple">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">count(item)</span>
+      <span class="fn-desc">Count occurrences</span>
+      <span class="complexity on">O(n)</span>
+    </div>
+    <div class="card-body">
+      <pre>t = (<span class="num">1</span>, <span class="num">2</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">2</span>)
+cnt = t.count(<span class="num">2</span>)  <span class="cmt"># 3</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="unpack destructure tuple assign">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">Unpacking & Slicing</span>
+      <span class="fn-desc">Destructure and slice tuples</span>
+      <span class="complexity on">O(n)</span>
+    </div>
+    <div class="card-body">
+      <pre>a, b, c = (<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>)
+x, *rest = (<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>)  <span class="cmt"># x=1, rest=[2,3,4]</span>
+
+t[<span class="num">1</span>:<span class="num">3</span>]   <span class="cmt"># (2, 3)</span>
+t[::-<span class="num">1</span>]  <span class="cmt"># Reversed tuple</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="concatenate repeat multiply add tuple operator">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">&#9654;</span>
+      <span class="fn-name">+ (concat) / * (repeat)</span>
+      <span class="fn-desc">Concatenation and repetition</span>
+      <span class="complexity on">O(n+m) / O(n*k)</span>
+    </div>
+    <div class="card-body">
+      <pre>t1 = (<span class="num">1</span>, <span class="num">2</span>) + (<span class="num">3</span>, <span class="num">4</span>)  <span class="cmt"># (1, 2, 3, 4)</span>
+t2 = (<span class="num">0</span>,) * <span class="num">5</span>           <span class="cmt"># (0, 0, 0, 0, 0)</span>
+<span class="cmt"># Single element tuple requires trailing comma</span>
+t3 = (<span class="num">1</span>,)               <span class="cmt"># tuple, not int</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="in membership len length contains tuple">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">&#9654;</span>
+      <span class="fn-name">len() / in / not in</span>
+      <span class="fn-desc">Length and membership test</span>
+      <span class="complexity on">O(1) / O(n)</span>
+    </div>
+    <div class="card-body">
+      <pre>t = (<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>)
+<span class="fn">len</span>(t)         <span class="cmt"># 4  — O(1)</span>
+<span class="num">3</span> <span class="kw">in</span> t         <span class="cmt"># True  — O(n)</span>
+<span class="num">5</span> <span class="kw">not in</span> t     <span class="cmt"># True  — O(n)</span>
+<span class="fn">min</span>(t), <span class="fn">max</span>(t) <span class="cmt"># 1, 4  — O(n)</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="tuple creation convert constructor">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">&#9654;</span>
+      <span class="fn-name">tuple() constructor</span>
+      <span class="fn-desc">Create tuples from iterables</span>
+      <span class="complexity on">O(n)</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="fn">tuple</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])     <span class="cmt"># (1, 2, 3) from list</span>
+<span class="fn">tuple</span>(<span class="str">"abc"</span>)           <span class="cmt"># ('a', 'b', 'c') from string</span>
+<span class="fn">tuple</span>(<span class="fn">range</span>(<span class="num">5</span>))       <span class="cmt"># (0, 1, 2, 3, 4) from range</span>
+<span class="fn">tuple</span>({<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>})      <span class="cmt"># from set (order varies)</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ────── 3. SET ────── -->
+<section class="section" id="set">
+  <div class="section-header">
+    <span class="num">3</span>
+    <h2>Set</h2>
+    <span class="badge">Unordered · Unique · O(1) Lookup</span>
+  </div>
+  <div class="desc">
+    Unordered collection of unique elements. <strong>O(1)</strong> average for add/remove/lookup. Automatically eliminates duplicates.
+  </div>
+
+  <div class="method-card" data-search="add element set"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">add(elem)</span><span class="fn-desc">Add element (no effect if exists)</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>s = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+s.add(<span class="num">4</span>)  <span class="cmt"># {1, 2, 3, 4}</span>
+s.add(<span class="num">3</span>)  <span class="cmt"># {1, 2, 3, 4} — no change</span></pre></div></div>
+
+  <div class="method-card" data-search="remove delete set keyerror"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">remove(elem)</span><span class="fn-desc">Remove element (raises KeyError)</span><span class="complexity o1">O(1)</span></div><div class="card-body"><p class="note">⚠ Raises KeyError if element not present.</p><pre>s = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+s.remove(<span class="num">2</span>)  <span class="cmt"># {1, 3}</span></pre></div></div>
+
+  <div class="method-card" data-search="discard remove safe set"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">discard(elem)</span><span class="fn-desc">Remove if present (no error)</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>s = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+s.discard(<span class="num">2</span>)  <span class="cmt"># {1, 3}</span>
+s.discard(<span class="num">5</span>)  <span class="cmt"># {1, 3} — no error</span></pre></div></div>
+
+  <div class="method-card" data-search="pop arbitrary random set"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">pop()</span><span class="fn-desc">Remove &amp; return arbitrary element</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>s = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+elem = s.pop()  <span class="cmt"># Could be any of 1, 2, 3</span></pre></div></div>
+
+  <div class="method-card" data-search="union combine merge or set"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">union(*others) | </span><span class="fn-desc">All elements from both sets</span><span class="complexity on">O(n+m)</span></div><div class="card-body"><pre>s1 = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+s2 = {<span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>}
+s3 = s1.union(s2)  <span class="cmt"># {1, 2, 3, 4, 5}</span>
+s3 = s1 <span class="op">|</span> s2      <span class="cmt"># Same result</span></pre></div></div>
+
+  <div class="method-card" data-search="intersection common and set"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">intersection(*others) &amp;</span><span class="fn-desc">Elements common to all</span><span class="complexity on">O(min)</span></div><div class="card-body"><pre>s1 = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+s2 = {<span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>}
+s3 = s1 <span class="op">&amp;</span> s2  <span class="cmt"># {2, 3}</span></pre></div></div>
+
+  <div class="method-card" data-search="difference subtract minus set"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">difference(*others) -</span><span class="fn-desc">Elements in first but not others</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>s1 = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+s2 = {<span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>}
+s3 = s1 <span class="op">-</span> s2  <span class="cmt"># {1}</span></pre></div></div>
+
+  <div class="method-card" data-search="symmetric difference xor set"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">symmetric_difference(other) ^</span><span class="fn-desc">Elements in either but not both</span><span class="complexity on">O(n+m)</span></div><div class="card-body"><pre>s1 = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+s2 = {<span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>}
+s3 = s1 <span class="op">^</span> s2  <span class="cmt"># {1, 4}</span></pre></div></div>
+
+  <div class="method-card" data-search="subset superset disjoint check set"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">issubset / issuperset / isdisjoint</span><span class="fn-desc">Set relationship checks</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>s1 = {<span class="num">1</span>, <span class="num">2</span>}; s2 = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+s1.issubset(s2)     <span class="cmt"># True  (s1 <= s2)</span>
+s2.issuperset(s1)   <span class="cmt"># True  (s2 >= s1)</span>
+
+s3 = {<span class="num">4</span>, <span class="num">5</span>}
+s1.isdisjoint(s3)   <span class="cmt"># True  (no common elements)</span></pre></div></div>
+
+  <div class="method-card" data-search="update inplace set operations"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">In-place: update |= &amp;= -= ^=</span><span class="fn-desc">Modify set in-place</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>s = {<span class="num">1</span>, <span class="num">2</span>}
+s <span class="op">|=</span> {<span class="num">3</span>, <span class="num">4</span>}  <span class="cmt"># update: {1, 2, 3, 4}</span>
+s <span class="op">&amp;=</span> {<span class="num">2</span>, <span class="num">3</span>}  <span class="cmt"># intersection_update: {2, 3}</span>
+s <span class="op">-=</span> {<span class="num">3</span>}     <span class="cmt"># difference_update: {2}</span></pre></div></div>
+
+  <div class="method-card" data-search="clear empty set remove all"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">clear()</span><span class="fn-desc">Remove all elements</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>s = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+s.clear()  <span class="cmt"># set()</span></pre></div></div>
+
+  <div class="method-card" data-search="copy shallow clone set"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">copy()</span><span class="fn-desc">Shallow copy of the set</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>s1 = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+s2 = s1.copy()  <span class="cmt"># {1, 2, 3} — independent copy</span>
+s2.add(<span class="num">4</span>)       <span class="cmt"># s1 unchanged</span></pre></div></div>
+
+  <div class="method-card" data-search="frozenset immutable hashable frozen set"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">frozenset(iterable)</span><span class="fn-desc">Immutable &amp; hashable set</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>fs = <span class="fn">frozenset</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])
+
+<span class="cmt"># Can be used as dict key or set element</span>
+d = {fs: <span class="str">"value"</span>}
+s = {<span class="fn">frozenset</span>({<span class="num">1</span>, <span class="num">2</span>}), <span class="fn">frozenset</span>({<span class="num">3</span>, <span class="num">4</span>})}
+
+<span class="cmt"># Supports all non-mutating set operations</span>
+fs1 = <span class="fn">frozenset</span>({<span class="num">1</span>, <span class="num">2</span>}) <span class="op">|</span> <span class="fn">frozenset</span>({<span class="num">3</span>})  <span class="cmt"># frozenset({1, 2, 3})</span></pre></div></div>
+
+  <div class="method-card" data-search="set comprehension generator build create"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">Set Comprehension</span><span class="fn-desc">Build sets with concise syntax</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>squares = {x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>)}
+<span class="cmt"># {0, 1, 4, 9, 16}</span>
+
+unique_lengths = {<span class="fn">len</span>(w) <span class="kw">for</span> w <span class="kw">in</span> [<span class="str">"hi"</span>, <span class="str">"hello"</span>, <span class="str">"hey"</span>]}
+<span class="cmt"># {2, 5, 3}</span></pre></div></div>
+</section>
+
+<!-- ────── 4. DICTIONARY ────── -->
+<section class="section" id="dict">
+  <div class="section-header">
+    <span class="num">4</span>
+    <h2>Dictionary</h2>
+    <span class="badge">Key-Value · Ordered (3.7+) · O(1)</span>
+  </div>
+  <div class="desc">
+    Key-value pairs, insertion-ordered since Python 3.7. <strong>O(1)</strong> average for lookup, insert, delete. Keys must be hashable.
+  </div>
+
+  <div class="method-card" data-search="keys values items views dict iterate"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">keys() / values() / items()</span><span class="fn-desc">View objects for iteration</span><span class="complexity on">O(n) iter</span></div><div class="card-body"><pre>d = {<span class="str">'a'</span>: <span class="num">1</span>, <span class="str">'b'</span>: <span class="num">2</span>, <span class="str">'c'</span>: <span class="num">3</span>}
+d.keys()    <span class="cmt"># dict_keys(['a', 'b', 'c'])</span>
+d.values()  <span class="cmt"># dict_values([1, 2, 3])</span>
+d.items()   <span class="cmt"># dict_items([('a',1), ('b',2), ('c',3)])</span>
+
+<span class="kw">for</span> key, val <span class="kw">in</span> d.items():
+    <span class="fn">print</span>(key, val)</pre></div></div>
+
+  <div class="method-card" data-search="get default safe access dict"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">get(key, default=None)</span><span class="fn-desc">Safe access — never raises KeyError</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>d = {<span class="str">'a'</span>: <span class="num">1</span>, <span class="str">'b'</span>: <span class="num">2</span>}
+d.get(<span class="str">'a'</span>)      <span class="cmt"># 1</span>
+d.get(<span class="str">'x'</span>)      <span class="cmt"># None</span>
+d.get(<span class="str">'x'</span>, <span class="num">0</span>)   <span class="cmt"># 0 (custom default)</span></pre></div></div>
+
+  <div class="method-card" data-search="pop remove return dict key"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">pop(key, default)</span><span class="fn-desc">Remove key &amp; return value</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>d = {<span class="str">'a'</span>: <span class="num">1</span>, <span class="str">'b'</span>: <span class="num">2</span>}
+val = d.pop(<span class="str">'a'</span>)       <span class="cmt"># 1, d = {'b': 2}</span>
+val = d.pop(<span class="str">'x'</span>, <span class="kw">None</span>) <span class="cmt"># None (no error)</span></pre></div></div>
+
+  <div class="method-card" data-search="popitem last pair dict"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">popitem()</span><span class="fn-desc">Remove &amp; return last pair</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>d = {<span class="str">'a'</span>: <span class="num">1</span>, <span class="str">'b'</span>: <span class="num">2</span>, <span class="str">'c'</span>: <span class="num">3</span>}
+key, val = d.popitem()  <span class="cmt"># ('c', 3)</span></pre></div></div>
+
+  <div class="method-card" data-search="update merge overwrite dict"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">update(mapping)</span><span class="fn-desc">Merge key-value pairs</span><span class="complexity on">O(m)</span></div><div class="card-body"><pre>d = {<span class="str">'a'</span>: <span class="num">1</span>, <span class="str">'b'</span>: <span class="num">2</span>}
+d.update({<span class="str">'b'</span>: <span class="num">20</span>, <span class="str">'c'</span>: <span class="num">3</span>})
+<span class="cmt"># {'a': 1, 'b': 20, 'c': 3}</span>
+d.update(x=<span class="num">10</span>, y=<span class="num">20</span>)  <span class="cmt"># keyword args</span></pre></div></div>
+
+  <div class="method-card" data-search="setdefault get or create dict"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">setdefault(key, default)</span><span class="fn-desc">Get or create key with default</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>d = {<span class="str">'a'</span>: <span class="num">1</span>}
+d.setdefault(<span class="str">'a'</span>, <span class="num">10</span>)  <span class="cmt"># 1 (exists)</span>
+d.setdefault(<span class="str">'b'</span>, <span class="num">2</span>)   <span class="cmt"># 2 (created)</span></pre></div></div>
+
+  <div class="method-card" data-search="fromkeys create initialize dict"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">fromkeys(iterable, value)</span><span class="fn-desc">Create dict from keys</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>d = <span class="fn">dict</span>.fromkeys([<span class="str">'a'</span>, <span class="str">'b'</span>, <span class="str">'c'</span>])
+<span class="cmt"># {'a': None, 'b': None, 'c': None}</span>
+d = <span class="fn">dict</span>.fromkeys(<span class="fn">range</span>(<span class="num">3</span>), <span class="num">0</span>)
+<span class="cmt"># {0: 0, 1: 0, 2: 0}</span></pre></div></div>
+
+  <div class="method-card" data-search="direct access bracket del in dict"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">Direct Access: d[key], del, in</span><span class="fn-desc">Bracket access, delete, membership</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>d[<span class="str">'key'</span>]          <span class="cmt"># Get (KeyError if missing)</span>
+d[<span class="str">'key'</span>] = value  <span class="cmt"># Set</span>
+<span class="kw">del</span> d[<span class="str">'key'</span>]      <span class="cmt"># Delete (KeyError if missing)</span>
+<span class="str">'key'</span> <span class="kw">in</span> d        <span class="cmt"># Check existence → True/False</span></pre></div></div>
+
+  <div class="method-card" data-search="clear empty dict remove all"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">clear()</span><span class="fn-desc">Remove all key-value pairs</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>d = {<span class="str">'a'</span>: <span class="num">1</span>, <span class="str">'b'</span>: <span class="num">2</span>}
+d.clear()  <span class="cmt"># {}</span></pre></div></div>
+
+  <div class="method-card" data-search="copy shallow clone dict"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">copy()</span><span class="fn-desc">Shallow copy of the dictionary</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>d1 = {<span class="str">'a'</span>: <span class="num">1</span>, <span class="str">'b'</span>: [<span class="num">2</span>, <span class="num">3</span>]}
+d2 = d1.copy()
+d2[<span class="str">'c'</span>] = <span class="num">4</span>  <span class="cmt"># d1 unchanged</span>
+<span class="cmt"># Warning: nested mutables are shared (shallow)</span></pre></div></div>
+
+  <div class="method-card" data-search="merge union pipe operator dict 3.9"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">| merge / |= update (3.9+)</span><span class="fn-desc">Merge dictionaries with operators</span><span class="complexity on">O(n+m)</span></div><div class="card-body"><pre>d1 = {<span class="str">'a'</span>: <span class="num">1</span>, <span class="str">'b'</span>: <span class="num">2</span>}
+d2 = {<span class="str">'b'</span>: <span class="num">20</span>, <span class="str">'c'</span>: <span class="num">3</span>}
+
+d3 = d1 <span class="op">|</span> d2   <span class="cmt"># {'a': 1, 'b': 20, 'c': 3} (new dict)</span>
+d1 <span class="op">|=</span> d2        <span class="cmt"># in-place merge (like update)</span></pre></div></div>
+
+  <div class="method-card" data-search="dict comprehension build create generate"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">Dict Comprehension</span><span class="fn-desc">Build dicts with concise syntax</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>squares = {x: x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>)}
+<span class="cmt"># {0: 0, 1: 1, 2: 4, 3: 9, 4: 16}</span>
+
+<span class="cmt"># Swap keys and values</span>
+d = {<span class="str">'a'</span>: <span class="num">1</span>, <span class="str">'b'</span>: <span class="num">2</span>}
+inv = {v: k <span class="kw">for</span> k, v <span class="kw">in</span> d.items()}  <span class="cmt"># {1: 'a', 2: 'b'}</span>
+
+<span class="cmt"># With condition</span>
+evens = {k: v <span class="kw">for</span> k, v <span class="kw">in</span> d.items() <span class="kw">if</span> v % <span class="num">2</span> == <span class="num">0</span>}</pre></div></div>
+</section>
+
+<!-- ────── 5A. DEQUE ────── -->
+<section class="section" id="deque">
+  <div class="section-header">
+    <span class="num">5A</span>
+    <h2>Deque</h2>
+    <span class="badge">collections · Double-Ended Queue</span>
+  </div>
+  <div class="desc">
+    <code>from collections import deque</code> — Optimized for <strong>O(1)</strong> operations at both ends. Ideal for BFS and sliding window.
+  </div>
+
+  <div class="method-card" data-search="append appendleft deque ends"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">append(x) / appendleft(x)</span><span class="fn-desc">Add to right / left end</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="kw">from</span> collections <span class="kw">import</span> deque
+dq = deque([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])
+dq.append(<span class="num">4</span>)       <span class="cmt"># deque([1, 2, 3, 4])</span>
+dq.appendleft(<span class="num">0</span>)   <span class="cmt"># deque([0, 1, 2, 3, 4])</span></pre></div></div>
+
+  <div class="method-card" data-search="pop popleft deque remove ends"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">pop() / popleft()</span><span class="fn-desc">Remove from right / left end</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>dq = deque([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])
+val = dq.pop()      <span class="cmt"># 3</span>
+val = dq.popleft()  <span class="cmt"># 1, dq = deque([2])</span></pre></div></div>
+
+  <div class="method-card" data-search="extend extendleft deque multiple"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">extend(iter) / extendleft(iter)</span><span class="fn-desc">Add multiple elements</span><span class="complexity on">O(k)</span></div><div class="card-body"><pre>dq = deque([<span class="num">1</span>, <span class="num">2</span>])
+dq.extend([<span class="num">3</span>, <span class="num">4</span>])       <span class="cmt"># deque([1, 2, 3, 4])</span>
+dq.extendleft([<span class="num">5</span>, <span class="num">4</span>, <span class="num">3</span>]) <span class="cmt"># deque([3, 4, 5, 1, 2, 3, 4])</span>
+<span class="cmt"># Note: extendleft reverses order</span></pre></div></div>
+
+  <div class="method-card" data-search="rotate shift circular deque"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">rotate(n)</span><span class="fn-desc">Rotate right (positive) or left (negative)</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>dq = deque([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>])
+dq.rotate(<span class="num">1</span>)   <span class="cmt"># deque([4, 1, 2, 3])</span>
+dq.rotate(-<span class="num">2</span>)  <span class="cmt"># deque([2, 3, 4, 1])</span></pre></div></div>
+
+  <div class="method-card" data-search="remove count index search deque"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">remove(val) / count(val) / index(val)</span><span class="fn-desc">Search and count elements</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>dq = deque([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">2</span>, <span class="num">4</span>])
+dq.remove(<span class="num">2</span>)       <span class="cmt"># deque([1, 3, 2, 4]) — first occurrence</span>
+dq.count(<span class="num">2</span>)        <span class="cmt"># 1</span>
+dq.index(<span class="num">3</span>)        <span class="cmt"># 1 — first occurrence index</span></pre></div></div>
+
+  <div class="method-card" data-search="reverse clear copy insert deque"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">reverse() / clear() / copy() / insert()</span><span class="fn-desc">In-place reverse, clear, copy, insert</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>dq = deque([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])
+dq.reverse()    <span class="cmt"># deque([3, 2, 1]) — in-place</span>
+dq.insert(<span class="num">1</span>, <span class="num">9</span>) <span class="cmt"># deque([3, 9, 2, 1]) — O(n)</span>
+dq2 = dq.copy() <span class="cmt"># shallow copy</span>
+dq.clear()      <span class="cmt"># deque([])</span></pre></div></div>
+
+  <div class="method-card" data-search="maxlen bounded deque size limit"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">deque(iterable, maxlen)</span><span class="fn-desc">Bounded deque — auto-discards old items</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="cmt"># Fixed-size deque (great for sliding window)</span>
+dq = deque(maxlen=<span class="num">3</span>)
+dq.append(<span class="num">1</span>); dq.append(<span class="num">2</span>); dq.append(<span class="num">3</span>)
+<span class="cmt"># deque([1, 2, 3], maxlen=3)</span>
+dq.append(<span class="num">4</span>)  <span class="cmt"># deque([2, 3, 4]) — 1 dropped</span>
+
+dq.maxlen  <span class="cmt"># 3 (read-only attribute)</span></pre></div></div>
+</section>
+
+<!-- ────── 5B. COUNTER ────── -->
+<section class="section" id="counter">
+  <div class="section-header">
+    <span class="num">5B</span>
+    <h2>Counter</h2>
+    <span class="badge">collections · Frequency Counter</span>
+  </div>
+  <div class="desc">
+    <code>from collections import Counter</code> — Subclass of dict for counting hashable objects efficiently.
+  </div>
+
+  <div class="method-card" data-search="most_common frequency top counter"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">most_common(n)</span><span class="fn-desc">Top n most common elements</span><span class="complexity onlogn">O(n log n)</span></div><div class="card-body"><pre><span class="kw">from</span> collections <span class="kw">import</span> Counter
+cnt = Counter([<span class="num">1</span>, <span class="num">2</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">3</span>, <span class="num">3</span>])
+cnt.most_common(<span class="num">2</span>)  <span class="cmt"># [(3, 3), (2, 2)]</span>
+cnt.most_common()   <span class="cmt"># All, sorted by count</span></pre></div></div>
+
+  <div class="method-card" data-search="elements expand repeat counter"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">elements()</span><span class="fn-desc">Iterator repeating each element by count</span><span class="complexity on">O(total)</span></div><div class="card-body"><pre>cnt = Counter([<span class="num">1</span>, <span class="num">2</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">3</span>, <span class="num">3</span>])
+<span class="fn">list</span>(cnt.elements())  <span class="cmt"># [1, 2, 2, 3, 3, 3]</span></pre></div></div>
+
+  <div class="method-card" data-search="update subtract add minus counter"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">update(iter) / subtract(iter)</span><span class="fn-desc">Add / subtract counts</span><span class="complexity on">O(k)</span></div><div class="card-body"><pre>cnt = Counter([<span class="num">1</span>, <span class="num">2</span>, <span class="num">2</span>])
+cnt.update([<span class="num">2</span>, <span class="num">3</span>, <span class="num">3</span>, <span class="num">3</span>])  <span class="cmt"># {1:1, 2:3, 3:3}</span>
+cnt.subtract([<span class="num">2</span>, <span class="num">3</span>])       <span class="cmt"># {1:1, 2:2, 3:2}</span></pre></div></div>
+
+  <div class="method-card" data-search="arithmetic add subtract union intersection counter"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">Arithmetic: + - &amp; |</span><span class="fn-desc">Counter operations</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>c1 = Counter(a=<span class="num">3</span>, b=<span class="num">1</span>)
+c2 = Counter(a=<span class="num">1</span>, b=<span class="num">2</span>)
+c1 + c2  <span class="cmt"># Counter({a: 4, b: 3})</span>
+c1 - c2  <span class="cmt"># Counter({a: 2}) — positive only</span>
+c1 &amp; c2  <span class="cmt"># Counter({a: 1, b: 1}) — min</span>
+c1 | c2  <span class="cmt"># Counter({a: 3, b: 2}) — max</span></pre></div></div>
+
+  <div class="method-card" data-search="total sum all counts counter"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">total() (3.10+)</span><span class="fn-desc">Sum of all counts</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>cnt = Counter(a=<span class="num">3</span>, b=<span class="num">2</span>, c=<span class="num">1</span>)
+cnt.total()  <span class="cmt"># 6 (sum of all counts)</span>
+
+<span class="cmt"># For Python &lt; 3.10 use:</span>
+<span class="fn">sum</span>(cnt.values())  <span class="cmt"># 6</span></pre></div></div>
+</section>
+
+<!-- ────── 5C. DEFAULTDICT ────── -->
+<section class="section" id="defaultdict">
+  <div class="section-header">
+    <span class="num">5C</span>
+    <h2>defaultdict</h2>
+    <span class="badge">collections · Auto-Default Values</span>
+  </div>
+  <div class="desc">
+    <code>from collections import defaultdict</code> — Dict that auto-creates default values for missing keys. All standard dict methods work.
+  </div>
+
+  <div class="method-card" data-search="defaultdict int list lambda factory"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">defaultdict(factory)</span><span class="fn-desc">Auto-initialize on missing key access</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="kw">from</span> collections <span class="kw">import</span> defaultdict
+
+dd = defaultdict(<span class="fn">int</span>)
+dd[<span class="str">'x'</span>] += <span class="num">1</span>  <span class="cmt"># 'x' → 0, then +1 = 1</span>
+
+dd = defaultdict(<span class="fn">list</span>)
+dd[<span class="str">'a'</span>].append(<span class="num">1</span>)  <span class="cmt"># 'a' → [], then append</span>
+
+dd = defaultdict(<span class="kw">lambda</span>: <span class="str">'N/A'</span>)
+dd[<span class="str">'missing'</span>]  <span class="cmt"># returns 'N/A'</span></pre></div></div>
+
+  <div class="method-card" data-search="default_factory missing_key nested defaultdict"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">default_factory / Nested defaultdict</span><span class="fn-desc">Access factory &amp; create nested structures</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>dd = defaultdict(<span class="fn">int</span>)
+dd.default_factory  <span class="cmt"># &lt;class 'int'&gt;</span>
+dd.default_factory = <span class="fn">list</span>  <span class="cmt"># change factory</span>
+
+<span class="cmt"># Nested defaultdict (adjacency list, 2D map)</span>
+graph = defaultdict(<span class="kw">lambda</span>: defaultdict(<span class="fn">int</span>))
+graph[<span class="str">'A'</span>][<span class="str">'B'</span>] = <span class="num">5</span>  <span class="cmt"># auto-creates both levels</span>
+
+<span class="cmt"># Group by multiple keys</span>
+dd = defaultdict(<span class="kw">lambda</span>: defaultdict(<span class="fn">list</span>))</pre></div></div>
+</section>
+
+<!-- ────── 5D. ORDEREDDICT ────── -->
+<section class="section" id="ordereddict">
+  <div class="section-header">
+    <span class="num">5D</span>
+    <h2>OrderedDict</h2>
+    <span class="badge">collections · Insertion Order</span>
+  </div>
+  <div class="desc">
+    <code>from collections import OrderedDict</code> — Dict remembering insertion order (regular dict also does in Python 3.7+). Useful for LRU Cache.
+  </div>
+
+  <div class="method-card" data-search="move_to_end ordereddict reorder lru"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">move_to_end(key, last=True)</span><span class="fn-desc">Move key to end or beginning</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="kw">from</span> collections <span class="kw">import</span> OrderedDict
+od = OrderedDict([(<span class="str">'a'</span>,<span class="num">1</span>), (<span class="str">'b'</span>,<span class="num">2</span>), (<span class="str">'c'</span>,<span class="num">3</span>)])
+od.move_to_end(<span class="str">'a'</span>)              <span class="cmt"># b, c, a</span>
+od.move_to_end(<span class="str">'b'</span>, last=<span class="kw">False</span>)  <span class="cmt"># b, c, a</span></pre></div></div>
+
+  <div class="method-card" data-search="popitem last first ordereddict lifo fifo"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">popitem(last=True)</span><span class="fn-desc">Pop from end (LIFO) or start (FIFO)</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>od = OrderedDict([(<span class="str">'a'</span>,<span class="num">1</span>), (<span class="str">'b'</span>,<span class="num">2</span>), (<span class="str">'c'</span>,<span class="num">3</span>)])
+od.popitem()            <span class="cmt"># ('c', 3) — last (default)</span>
+od.popitem(last=<span class="kw">False</span>)  <span class="cmt"># ('a', 1) — first</span>
+
+<span class="cmt"># Unlike regular dict.popitem() which only pops last</span></pre></div></div>
+
+  <div class="method-card" data-search="ordereddict equality comparison order"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">Equality (order-sensitive)</span><span class="fn-desc">Order matters for == comparison</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>od1 = OrderedDict([(<span class="str">'a'</span>,<span class="num">1</span>), (<span class="str">'b'</span>,<span class="num">2</span>)])
+od2 = OrderedDict([(<span class="str">'b'</span>,<span class="num">2</span>), (<span class="str">'a'</span>,<span class="num">1</span>)])
+od1 == od2  <span class="cmt"># False — order differs</span>
+
+<span class="cmt"># Regular dicts ignore order:</span>
+{<span class="str">'a'</span>:<span class="num">1</span>, <span class="str">'b'</span>:<span class="num">2</span>} == {<span class="str">'b'</span>:<span class="num">2</span>, <span class="str">'a'</span>:<span class="num">1</span>}  <span class="cmt"># True</span></pre></div></div>
+</section>
+
+<!-- ────── 5E. NAMEDTUPLE ────── -->
+<section class="section" id="namedtuple">
+  <div class="section-header">
+    <span class="num">5E</span>
+    <h2>namedtuple</h2>
+    <span class="badge">collections · Named Fields</span>
+  </div>
+  <div class="desc">
+    <code>from collections import namedtuple</code> — Tuple subclass with named fields. Lightweight class alternative, hashable, usable as dict keys.
+  </div>
+
+  <div class="method-card" data-search="namedtuple create make asdict replace fields"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">_make / _asdict / _replace / _fields</span><span class="fn-desc">Create, convert, modify instances</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="kw">from</span> collections <span class="kw">import</span> namedtuple
+Point = namedtuple(<span class="str">'Point'</span>, <span class="str">'x y'</span>)
+
+p = Point._make([<span class="num">1</span>, <span class="num">2</span>])  <span class="cmt"># Point(x=1, y=2)</span>
+p._asdict()               <span class="cmt"># {'x': 1, 'y': 2}</span>
+p._replace(x=<span class="num">10</span>)          <span class="cmt"># Point(x=10, y=2)</span>
+Point._fields              <span class="cmt"># ('x', 'y')</span>
+
+<span class="cmt"># Access: p.x, p[0], unpacking</span></pre></div></div>
+</section>
+
+<!-- ────── 6. HEAPQ ────── -->
+<section class="section" id="heapq">
+  <div class="section-header">
+    <span class="num">6</span>
+    <h2>heapq</h2>
+    <span class="badge">Min-Heap · Priority Queue</span>
+  </div>
+  <div class="desc">
+    <code>import heapq</code> — Min-heap (binary heap). <strong>O(log n)</strong> push/pop, <strong>O(n)</strong> heapify. For max-heap, negate values.
+  </div>
+
+  <div class="method-card" data-search="heappush heappop push pop heap"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">heappush / heappop</span><span class="fn-desc">Add item / remove smallest</span><span class="complexity ologn">O(log n)</span></div><div class="card-body"><pre><span class="kw">import</span> heapq
+heap = []
+heapq.heappush(heap, <span class="num">5</span>)
+heapq.heappush(heap, <span class="num">2</span>)
+heapq.heappush(heap, <span class="num">8</span>)  <span class="cmt"># [2, 5, 8]</span>
+val = heapq.heappop(heap) <span class="cmt"># 2</span></pre></div></div>
+
+  <div class="method-card" data-search="heapify transform list heap"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">heapify(list)</span><span class="fn-desc">Transform list into heap in-place</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>arr = [<span class="num">3</span>, <span class="num">1</span>, <span class="num">4</span>, <span class="num">1</span>, <span class="num">5</span>, <span class="num">9</span>, <span class="num">2</span>]
+heapq.heapify(arr)  <span class="cmt"># [1, 1, 2, 3, 5, 9, 4]</span></pre></div></div>
+
+  <div class="method-card" data-search="heappushpop heapreplace combined heap"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">heappushpop / heapreplace</span><span class="fn-desc">Combined push+pop operations</span><span class="complexity ologn">O(log n)</span></div><div class="card-body"><pre>heap = [<span class="num">2</span>, <span class="num">5</span>, <span class="num">8</span>]
+<span class="cmt"># heappushpop: push first, then pop smallest</span>
+heapq.heappushpop(heap, <span class="num">3</span>)  <span class="cmt"># returns 2</span>
+
+<span class="cmt"># heapreplace: pop first, then push</span>
+heapq.heapreplace(heap, <span class="num">1</span>) <span class="cmt"># returns smallest, adds 1</span></pre></div></div>
+
+  <div class="method-card" data-search="nlargest nsmallest top k heap"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">nlargest / nsmallest</span><span class="fn-desc">Get n largest/smallest elements</span><span class="complexity onlogn">O(n log k)</span></div><div class="card-body"><pre>arr = [<span class="num">1</span>, <span class="num">5</span>, <span class="num">3</span>, <span class="num">9</span>, <span class="num">2</span>]
+heapq.nlargest(<span class="num">3</span>, arr)   <span class="cmt"># [9, 5, 3]</span>
+heapq.nsmallest(<span class="num">3</span>, arr)  <span class="cmt"># [1, 2, 3]</span></pre></div></div>
+
+  <div class="method-card" data-search="max heap negative priority queue heap"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">Max-Heap & Priority Queue</span><span class="fn-desc">Workarounds and patterns</span><span class="complexity ologn">O(log n)</span></div><div class="card-body"><pre><span class="cmt"># Max-heap: negate values</span>
+heapq.heappush(heap, -val)
+
+<span class="cmt"># Priority Queue with heap</span>
+heap = []
+heapq.heappush(heap, (priority, item))
+priority, item = heapq.heappop(heap)</pre></div></div>
+
+  <div class="method-card" data-search="merge sorted iterables combine heap"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">merge(*iterables, key, reverse)</span><span class="fn-desc">Merge multiple sorted inputs into one</span><span class="complexity on">O(n) total</span></div><div class="card-body"><pre><span class="cmt"># Merge pre-sorted iterables (lazy iterator)</span>
+a = [<span class="num">1</span>, <span class="num">3</span>, <span class="num">5</span>]
+b = [<span class="num">2</span>, <span class="num">4</span>, <span class="num">6</span>]
+<span class="fn">list</span>(heapq.merge(a, b))  <span class="cmt"># [1, 2, 3, 4, 5, 6]</span>
+
+<span class="cmt"># With key function</span>
+<span class="fn">list</span>(heapq.merge(
+    [(<span class="num">1</span>, <span class="str">'a'</span>), (<span class="num">3</span>, <span class="str">'c'</span>)],
+    [(<span class="num">2</span>, <span class="str">'b'</span>)],
+    key=<span class="kw">lambda</span> x: x[<span class="num">0</span>]
+))</pre></div></div>
+</section>
+
+<!-- ────── 7. QUEUE ────── -->
+<section class="section" id="queue">
+  <div class="section-header">
+    <span class="num">7</span>
+    <h2>queue Module</h2>
+    <span class="badge">Thread-Safe · FIFO · LIFO · Priority</span>
+  </div>
+  <div class="desc">
+    <code>from queue import Queue, LifoQueue, PriorityQueue</code> — Thread-safe queue implementations.
+  </div>
+
+  <div class="method-card" data-search="queue fifo put get thread safe"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">Queue (FIFO)</span><span class="fn-desc">First In First Out</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="kw">from</span> queue <span class="kw">import</span> Queue
+q = Queue(maxsize=<span class="num">2</span>)
+q.put(<span class="num">1</span>); q.put(<span class="num">2</span>)
+val = q.get()    <span class="cmt"># 1</span>
+q.qsize()        <span class="cmt"># approximate size</span>
+q.empty()        <span class="cmt"># True/False</span>
+q.full()         <span class="cmt"># True/False</span></pre></div></div>
+
+  <div class="method-card" data-search="lifoqueue stack lifo put get"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">LifoQueue (Stack)</span><span class="fn-desc">Last In First Out</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="kw">from</span> queue <span class="kw">import</span> LifoQueue
+stack = LifoQueue()
+stack.put(<span class="num">1</span>); stack.put(<span class="num">2</span>)
+val = stack.get()  <span class="cmt"># 2 (last added)</span></pre></div></div>
+
+  <div class="method-card" data-search="priorityqueue priority lowest first"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">PriorityQueue</span><span class="fn-desc">Lowest priority first</span><span class="complexity ologn">O(log n)</span></div><div class="card-body"><pre><span class="kw">from</span> queue <span class="kw">import</span> PriorityQueue
+pq = PriorityQueue()
+pq.put((<span class="num">1</span>, <span class="str">'high'</span>))
+pq.put((<span class="num">5</span>, <span class="str">'low'</span>))
+pq.put((<span class="num">3</span>, <span class="str">'medium'</span>))
+priority, data = pq.get()  <span class="cmt"># (1, 'high')</span>
+
+<span class="cmt"># For non-comparable items, add counter:</span>
+pq.put((priority, counter, item))</pre></div></div>
+
+  <div class="method-card" data-search="task_done join synchronize queue threading"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">task_done() / join()</span><span class="fn-desc">Task completion &amp; synchronization</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="kw">from</span> queue <span class="kw">import</span> Queue
+q = Queue()
+q.put(<span class="str">'task1'</span>); q.put(<span class="str">'task2'</span>)
+
+item = q.get()
+<span class="cmt"># ... process item ...</span>
+q.task_done()  <span class="cmt"># signal task is complete</span>
+
+q.join()  <span class="cmt"># blocks until all tasks are done</span></pre></div></div>
+
+  <div class="method-card" data-search="put_nowait get_nowait nonblocking queue timeout"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">put_nowait / get_nowait / timeout</span><span class="fn-desc">Non-blocking &amp; timeout operations</span><span class="complexity o1">O(1)</span></div><div class="card-body"><p class="note">Raises queue.Full or queue.Empty if not possible.</p><pre><span class="kw">import</span> queue
+q = queue.Queue(maxsize=<span class="num">2</span>)
+
+q.put_nowait(<span class="num">1</span>)         <span class="cmt"># raises Full if full</span>
+val = q.get_nowait()    <span class="cmt"># raises Empty if empty</span>
+
+q.put(<span class="num">1</span>, timeout=<span class="num">5</span>)     <span class="cmt"># wait up to 5 seconds</span>
+val = q.get(timeout=<span class="num">5</span>)  <span class="cmt"># wait up to 5 seconds</span></pre></div></div>
+</section>
+
+<!-- ────── 8. ARRAY ────── -->
+<section class="section" id="array">
+  <div class="section-header">
+    <span class="num">8</span>
+    <h2>array Module</h2>
+    <span class="badge">Efficient · Typed Arrays</span>
+  </div>
+  <div class="desc">
+    <code>from array import array</code> — Efficient arrays of basic C-types. Type codes: <strong>'b'</strong> byte, <strong>'i'</strong> int, <strong>'f'</strong> float, <strong>'d'</strong> double.
+  </div>
+
+  <div class="method-card" data-search="array typed basic operations"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">array operations</span><span class="fn-desc">append, extend, insert, pop, remove, reverse</span><span class="complexity on">O(1)–O(n)</span></div><div class="card-body"><pre><span class="kw">from</span> array <span class="kw">import</span> array
+arr = array(<span class="str">'i'</span>, [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])  <span class="cmt"># signed integer</span>
+arr.append(<span class="num">4</span>)
+arr.extend([<span class="num">5</span>, <span class="num">6</span>])
+arr.pop()  <span class="cmt"># 6</span>
+
+<span class="cmt"># Type codes: 'b' byte, 'i' int, 'f' float, 'd' double</span></pre></div></div>
+
+  <div class="method-card" data-search="tobytes frombytes tolist fromlist array convert"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">tobytes / frombytes / tolist</span><span class="fn-desc">Convert to/from bytes and lists</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="kw">from</span> array <span class="kw">import</span> array
+arr = array(<span class="str">'i'</span>, [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])
+
+b = arr.tobytes()    <span class="cmt"># raw bytes representation</span>
+arr2 = array(<span class="str">'i'</span>)
+arr2.frombytes(b)    <span class="cmt"># array('i', [1, 2, 3])</span>
+
+lst = arr.tolist()   <span class="cmt"># [1, 2, 3] — regular Python list</span>
+arr.fromlist([<span class="num">4</span>, <span class="num">5</span>]) <span class="cmt"># array('i', [1, 2, 3, 4, 5])</span></pre></div></div>
+
+  <div class="method-card" data-search="typecode itemsize buffer_info array info"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">typecode / itemsize / buffer_info()</span><span class="fn-desc">Array metadata and info</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>arr = array(<span class="str">'i'</span>, [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])
+arr.typecode       <span class="cmt"># 'i'</span>
+arr.itemsize       <span class="cmt"># 4 (bytes per element)</span>
+arr.buffer_info()  <span class="cmt"># (address, length)</span>
+
+<span class="cmt"># Type codes:
+# 'b' signed char    'B' unsigned char
+# 'h' signed short   'H' unsigned short
+# 'i' signed int     'I' unsigned int
+# 'l' signed long    'L' unsigned long
+# 'f' float          'd' double</span></pre></div></div>
+</section>
+
+<!-- ────── 9. STRING ────── -->
+<section class="section" id="string">
+  <div class="section-header">
+    <span class="num">9</span>
+    <h2>String Operations</h2>
+    <span class="badge">Immutable · Sequence</span>
+  </div>
+  <div class="desc">Strings are immutable sequences. All methods return new strings.</div>
+
+  <div class="method-card" data-search="split join string tokenize combine"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">split(sep) / join(iter)</span><span class="fn-desc">Tokenize / combine strings</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>s = <span class="str">"hello world python"</span>
+s.split()          <span class="cmt"># ['hello', 'world', 'python']</span>
+s.split(<span class="str">' '</span>, <span class="num">1</span>)    <span class="cmt"># ['hello', 'world python']</span>
+
+<span class="str">' '</span>.join([<span class="str">'hello'</span>, <span class="str">'world'</span>])  <span class="cmt"># 'hello world'</span>
+<span class="str">''</span>.join([<span class="str">'a'</span>, <span class="str">'b'</span>, <span class="str">'c'</span>])     <span class="cmt"># 'abc'</span></pre></div></div>
+
+  <div class="method-card" data-search="find replace search substring string"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">find(sub) / replace(old, new)</span><span class="fn-desc">Search / substitute in string</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>s = <span class="str">"hello world"</span>
+s.find(<span class="str">"world"</span>)    <span class="cmt"># 6 (-1 if not found)</span>
+s.replace(<span class="str">"world"</span>, <span class="str">"python"</span>)  <span class="cmt"># "hello python"</span>
+s.replace(<span class="str">"o"</span>, <span class="str">"0"</span>, <span class="num">1</span>)       <span class="cmt"># "hell0 world" (1st only)</span></pre></div></div>
+
+  <div class="method-card" data-search="upper lower strip case whitespace string"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">upper / lower / strip</span><span class="fn-desc">Case conversion &amp; trimming</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="str">"hello"</span>.upper()     <span class="cmt"># "HELLO"</span>
+<span class="str">"HELLO"</span>.lower()     <span class="cmt"># "hello"</span>
+<span class="str">"  hi  "</span>.strip()    <span class="cmt"># "hi"</span>
+<span class="str">"##hi##"</span>.strip(<span class="str">'#'</span>) <span class="cmt"># "hi"</span></pre></div></div>
+
+  <div class="method-card" data-search="startswith endswith isdigit isalpha check string"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">startswith / endswith / is*</span><span class="fn-desc">Prefix, suffix, character checks</span><span class="complexity on">O(m)</span></div><div class="card-body"><pre><span class="str">"hello"</span>.startswith(<span class="str">"he"</span>)  <span class="cmt"># True</span>
+<span class="str">"hello"</span>.endswith(<span class="str">"lo"</span>)    <span class="cmt"># True</span>
+<span class="str">"123"</span>.isdigit()           <span class="cmt"># True</span>
+<span class="str">"abc"</span>.isalpha()           <span class="cmt"># True</span>
+<span class="str">"abc123"</span>.isalnum()        <span class="cmt"># True</span></pre></div></div>
+
+  <div class="method-card" data-search="count occurrences frequency string"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">count(sub, start, end)</span><span class="fn-desc">Count non-overlapping occurrences</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>s = <span class="str">"abracadabra"</span>
+s.count(<span class="str">"a"</span>)      <span class="cmt"># 5</span>
+s.count(<span class="str">"ab"</span>)     <span class="cmt"># 2</span>
+s.count(<span class="str">"a"</span>, <span class="num">3</span>)  <span class="cmt"># 3 (from index 3 onwards)</span></pre></div></div>
+
+  <div class="method-card" data-search="index rfind rindex search string position"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">index(sub) / rfind(sub) / rindex(sub)</span><span class="fn-desc">Search from left or right</span><span class="complexity on">O(n)</span></div><div class="card-body"><p class="note">index/rindex raise ValueError if not found. find/rfind return -1.</p><pre>s = <span class="str">"hello world hello"</span>
+s.index(<span class="str">"hello"</span>)   <span class="cmt"># 0 (first, raises if missing)</span>
+s.rfind(<span class="str">"hello"</span>)   <span class="cmt"># 12 (last, returns -1 if missing)</span>
+s.rindex(<span class="str">"hello"</span>)  <span class="cmt"># 12 (last, raises if missing)</span></pre></div></div>
+
+  <div class="method-card" data-search="title capitalize swapcase casefold string case"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">title / capitalize / swapcase / casefold</span><span class="fn-desc">Case transformations</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="str">"hello world"</span>.title()       <span class="cmt"># "Hello World"</span>
+<span class="str">"hello world"</span>.capitalize()  <span class="cmt"># "Hello world"</span>
+<span class="str">"Hello"</span>.swapcase()          <span class="cmt"># "hELLO"</span>
+<span class="str">"Straße"</span>.casefold()         <span class="cmt"># "strasse" (aggressive lowercase)</span></pre></div></div>
+
+  <div class="method-card" data-search="center ljust rjust zfill pad align string"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">center / ljust / rjust / zfill</span><span class="fn-desc">Padding and alignment</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="str">"hi"</span>.center(<span class="num">10</span>)       <span class="cmt"># "    hi    "</span>
+<span class="str">"hi"</span>.center(<span class="num">10</span>, <span class="str">'-'</span>)  <span class="cmt"># "----hi----"</span>
+<span class="str">"hi"</span>.ljust(<span class="num">10</span>)        <span class="cmt"># "hi        "</span>
+<span class="str">"hi"</span>.rjust(<span class="num">10</span>)        <span class="cmt"># "        hi"</span>
+<span class="str">"42"</span>.zfill(<span class="num">5</span>)         <span class="cmt"># "00042"</span></pre></div></div>
+
+  <div class="method-card" data-search="partition rpartition split three string"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">partition(sep) / rpartition(sep)</span><span class="fn-desc">Split into 3 parts at separator</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>s = <span class="str">"hello=world=test"</span>
+s.partition(<span class="str">'='</span>)    <span class="cmt"># ('hello', '=', 'world=test')</span>
+s.rpartition(<span class="str">'='</span>)   <span class="cmt"># ('hello=world', '=', 'test')</span>
+s.partition(<span class="str">'X'</span>)    <span class="cmt"># ('hello=world=test', '', '')</span></pre></div></div>
+
+  <div class="method-card" data-search="format fstring template string interpolation"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">f-strings / format()</span><span class="fn-desc">String formatting and interpolation</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>name = <span class="str">"World"</span>; n = <span class="num">42</span>
+<span class="kw">f</span><span class="str">"Hello {name}!"</span>          <span class="cmt"># "Hello World!"</span>
+<span class="kw">f</span><span class="str">"{n:05d}"</span>                 <span class="cmt"># "00042" — zero-padded</span>
+<span class="kw">f</span><span class="str">"{n:.2f}"</span>                 <span class="cmt"># "42.00" — float precision</span>
+<span class="kw">f</span><span class="str">"{n:>10}"</span>                 <span class="cmt"># "        42" — right-align</span>
+
+<span class="str">"{} is {}"</span>.format(name, n)  <span class="cmt"># "World is 42"</span></pre></div></div>
+
+  <div class="method-card" data-search="lstrip rstrip strip sides whitespace string"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">lstrip(chars) / rstrip(chars)</span><span class="fn-desc">Strip from left or right only</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="str">"  hello  "</span>.lstrip()    <span class="cmt"># "hello  "</span>
+<span class="str">"  hello  "</span>.rstrip()    <span class="cmt"># "  hello"</span>
+<span class="str">"xxhelloxx"</span>.lstrip(<span class="str">'x'</span>) <span class="cmt"># "helloxx"</span>
+<span class="str">"xxhelloxx"</span>.rstrip(<span class="str">'x'</span>) <span class="cmt"># "xxhello"</span></pre></div></div>
+
+  <div class="method-card" data-search="splitlines lines newline string"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">splitlines(keepends=False)</span><span class="fn-desc">Split on line boundaries</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>s = <span class="str">"line1\nline2\nline3"</span>
+s.splitlines()        <span class="cmt"># ['line1', 'line2', 'line3']</span>
+s.splitlines(<span class="kw">True</span>)    <span class="cmt"># ['line1\n', 'line2\n', 'line3']</span></pre></div></div>
+
+  <div class="method-card" data-search="maketrans translate character mapping string"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">maketrans / translate</span><span class="fn-desc">Character-level translation</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="cmt"># Create translation table</span>
+table = <span class="fn">str</span>.maketrans(<span class="str">"aeiou"</span>, <span class="str">"12345"</span>)
+<span class="str">"hello"</span>.translate(table)  <span class="cmt"># "h2ll4"</span>
+
+<span class="cmt"># With deletion (3rd arg)</span>
+table = <span class="fn">str</span>.maketrans(<span class="str">""</span>, <span class="str">""</span>, <span class="str">"aeiou"</span>)
+<span class="str">"hello world"</span>.translate(table)  <span class="cmt"># "hll wrld"</span></pre></div></div>
+
+  <div class="method-card" data-search="encode decode bytes utf8 string"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">encode(encoding) / bytes.decode()</span><span class="fn-desc">String to bytes and back</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>b = <span class="str">"hello"</span>.encode(<span class="str">'utf-8'</span>)  <span class="cmt"># b'hello'</span>
+s = b.decode(<span class="str">'utf-8'</span>)          <span class="cmt"># "hello"</span>
+
+<span class="str">"café"</span>.encode(<span class="str">'ascii'</span>, errors=<span class="str">'replace'</span>)  <span class="cmt"># b'caf?'</span></pre></div></div>
+</section>
+
+<!-- ────── 10. BUILT-IN FUNCTIONS ────── -->
+<section class="section" id="builtins">
+  <div class="section-header">
+    <span class="num">10</span>
+    <h2>Built-in Functions</h2>
+    <span class="badge">Essential DSA Utils</span>
+  </div>
+  <div class="desc">Key Python built-in functions commonly used in DSA.</div>
+
+  <div class="method-card" data-search="len min max sum basic builtin"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">len / min / max / sum</span><span class="fn-desc">Length, extremes, total</span><span class="complexity on">O(1)/O(n)</span></div><div class="card-body"><pre><span class="fn">len</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>])  <span class="cmt"># 3  — O(1)</span>
+<span class="fn">min</span>([<span class="num">3</span>,<span class="num">1</span>,<span class="num">4</span>])  <span class="cmt"># 1  — O(n)</span>
+<span class="fn">max</span>([<span class="num">3</span>,<span class="num">1</span>,<span class="num">4</span>])  <span class="cmt"># 4  — O(n)</span>
+<span class="fn">sum</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>])  <span class="cmt"># 6  — O(n)</span>
+<span class="fn">sum</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>], <span class="num">10</span>)  <span class="cmt"># 16 — with start value</span>
+
+<span class="fn">min</span>([<span class="num">3</span>,<span class="num">1</span>,<span class="num">4</span>], key=<span class="kw">lambda</span> x: -x)  <span class="cmt"># 4</span></pre></div></div>
+
+  <div class="method-card" data-search="sorted reversed sort order builtin"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">sorted / reversed</span><span class="fn-desc">New sorted list / reverse iterator</span><span class="complexity onlogn">O(n log n)</span></div><div class="card-body"><pre><span class="fn">sorted</span>([<span class="num">3</span>,<span class="num">1</span>,<span class="num">4</span>,<span class="num">1</span>])           <span class="cmt"># [1, 1, 3, 4]</span>
+<span class="fn">sorted</span>([<span class="str">'a'</span>,<span class="str">'bb'</span>], key=<span class="fn">len</span>) <span class="cmt"># ['a', 'bb']</span>
+<span class="fn">sorted</span>([<span class="num">3</span>,<span class="num">1</span>], reverse=<span class="kw">True</span>) <span class="cmt"># [3, 1]</span>
+
+<span class="fn">list</span>(<span class="fn">reversed</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>]))      <span class="cmt"># [3, 2, 1]</span></pre></div></div>
+
+  <div class="method-card" data-search="enumerate zip index pair builtin"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">enumerate / zip</span><span class="fn-desc">Index-value pairs / combine iterables</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="kw">for</span> i, val <span class="kw">in</span> <span class="fn">enumerate</span>([<span class="str">'a'</span>,<span class="str">'b'</span>,<span class="str">'c'</span>]):
+    <span class="fn">print</span>(i, val)  <span class="cmt"># 0 a, 1 b, 2 c</span>
+
+<span class="fn">list</span>(<span class="fn">zip</span>([<span class="num">1</span>,<span class="num">2</span>], [<span class="str">'a'</span>,<span class="str">'b'</span>]))
+<span class="cmt"># [(1, 'a'), (2, 'b')]</span></pre></div></div>
+
+  <div class="method-card" data-search="map filter transform select builtin"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">map / filter</span><span class="fn-desc">Transform / select elements</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="fn">list</span>(<span class="fn">map</span>(<span class="fn">str</span>, [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>]))           <span class="cmt"># ['1','2','3']</span>
+<span class="fn">list</span>(<span class="fn">map</span>(<span class="kw">lambda</span> x: x*<span class="num">2</span>, [<span class="num">1</span>,<span class="num">2</span>]))  <span class="cmt"># [2, 4]</span>
+<span class="fn">list</span>(<span class="fn">filter</span>(<span class="kw">lambda</span> x: x><span class="num">2</span>, [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>]))  <span class="cmt"># [3, 4]</span></pre></div></div>
+
+  <div class="method-card" data-search="any all truthy check boolean builtin"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">any / all</span><span class="fn-desc">Boolean aggregation</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="fn">any</span>([<span class="kw">False</span>, <span class="kw">False</span>, <span class="kw">True</span>])  <span class="cmt"># True</span>
+<span class="fn">all</span>([<span class="kw">True</span>, <span class="kw">True</span>, <span class="num">1</span>])       <span class="cmt"># True</span>
+<span class="fn">all</span>([<span class="kw">True</span>, <span class="kw">False</span>])          <span class="cmt"># False</span></pre></div></div>
+
+  <div class="method-card" data-search="range list set dict tuple convert cast builtin"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">range / list / set / dict / tuple</span><span class="fn-desc">Generators &amp; type conversions</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="fn">list</span>(<span class="fn">range</span>(<span class="num">5</span>))          <span class="cmt"># [0, 1, 2, 3, 4]</span>
+<span class="fn">list</span>(<span class="fn">range</span>(<span class="num">0</span>,<span class="num">10</span>,<span class="num">2</span>))     <span class="cmt"># [0, 2, 4, 6, 8]</span>
+<span class="fn">set</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">2</span>,<span class="num">3</span>])          <span class="cmt"># {1, 2, 3}</span>
+<span class="fn">dict</span>([(<span class="str">'a'</span>,<span class="num">1</span>),(<span class="str">'b'</span>,<span class="num">2</span>)]) <span class="cmt"># {'a': 1, 'b': 2}</span>
+<span class="fn">tuple</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>])           <span class="cmt"># (1, 2, 3)</span></pre></div></div>
+
+  <div class="method-card" data-search="abs round divmod absolute value remainder builtin"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">abs / round / divmod</span><span class="fn-desc">Absolute value, rounding, div+mod</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="fn">abs</span>(-<span class="num">5</span>)          <span class="cmt"># 5</span>
+<span class="fn">abs</span>(<span class="num">3</span>+<span class="num">4</span>j)        <span class="cmt"># 5.0 (complex magnitude)</span>
+<span class="fn">round</span>(<span class="num">3.14159</span>, <span class="num">2</span>) <span class="cmt"># 3.14</span>
+<span class="fn">round</span>(<span class="num">1234</span>, -<span class="num">2</span>)   <span class="cmt"># 1200</span>
+<span class="fn">divmod</span>(<span class="num">17</span>, <span class="num">5</span>)     <span class="cmt"># (3, 2) — (quotient, remainder)</span></pre></div></div>
+
+  <div class="method-card" data-search="ord chr character unicode codepoint builtin"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">ord / chr</span><span class="fn-desc">Character to/from Unicode code point</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="fn">ord</span>(<span class="str">'A'</span>)   <span class="cmt"># 65</span>
+<span class="fn">ord</span>(<span class="str">'a'</span>)   <span class="cmt"># 97</span>
+<span class="fn">ord</span>(<span class="str">'0'</span>)   <span class="cmt"># 48</span>
+<span class="fn">chr</span>(<span class="num">65</span>)    <span class="cmt"># 'A'</span>
+<span class="fn">chr</span>(<span class="num">97</span>)    <span class="cmt"># 'a'</span>
+
+<span class="cmt"># Useful: check if char is letter/digit</span>
+<span class="fn">ord</span>(<span class="str">'a'</span>) <= <span class="fn">ord</span>(c) <= <span class="fn">ord</span>(<span class="str">'z'</span>)  <span class="cmt"># lowercase?</span></pre></div></div>
+
+  <div class="method-card" data-search="bin hex oct binary hexadecimal octal convert builtin"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">bin / hex / oct / int(s, base)</span><span class="fn-desc">Number base conversions</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="fn">bin</span>(<span class="num">10</span>)        <span class="cmt"># '0b1010'</span>
+<span class="fn">hex</span>(<span class="num">255</span>)       <span class="cmt"># '0xff'</span>
+<span class="fn">oct</span>(<span class="num">8</span>)         <span class="cmt"># '0o10'</span>
+
+<span class="fn">int</span>(<span class="str">'1010'</span>, <span class="num">2</span>)  <span class="cmt"># 10 (binary to int)</span>
+<span class="fn">int</span>(<span class="str">'ff'</span>, <span class="num">16</span>)   <span class="cmt"># 255 (hex to int)</span>
+<span class="fn">int</span>(<span class="str">'10'</span>, <span class="num">8</span>)    <span class="cmt"># 8 (octal to int)</span>
+
+<span class="cmt"># Count set bits</span>
+<span class="fn">bin</span>(<span class="num">10</span>).count(<span class="str">'1'</span>)  <span class="cmt"># 2</span></pre></div></div>
+
+  <div class="method-card" data-search="isinstance type class check identity builtin"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">isinstance / type / id / hash</span><span class="fn-desc">Type checking and identity</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="fn">isinstance</span>(<span class="num">5</span>, <span class="fn">int</span>)          <span class="cmt"># True</span>
+<span class="fn">isinstance</span>(<span class="num">5</span>, (<span class="fn">int</span>, <span class="fn">float</span>))  <span class="cmt"># True (check multiple)</span>
+<span class="fn">type</span>(<span class="num">5</span>)                      <span class="cmt"># &lt;class 'int'&gt;</span>
+<span class="fn">id</span>([<span class="num">1</span>,<span class="num">2</span>])                    <span class="cmt"># memory address (integer)</span>
+<span class="fn">hash</span>(<span class="str">'key'</span>)                  <span class="cmt"># hash value (for dict/set)</span></pre></div></div>
+
+  <div class="method-card" data-search="iter next iterator protocol stopiteration builtin"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">iter / next</span><span class="fn-desc">Manual iteration protocol</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>it = <span class="fn">iter</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])
+<span class="fn">next</span>(it)            <span class="cmt"># 1</span>
+<span class="fn">next</span>(it)            <span class="cmt"># 2</span>
+<span class="fn">next</span>(it)            <span class="cmt"># 3</span>
+<span class="fn">next</span>(it, <span class="str">'done'</span>)   <span class="cmt"># 'done' (default if exhausted)</span>
+
+<span class="cmt"># Two-arg iter: call until sentinel</span>
+<span class="kw">import</span> random
+rolls = <span class="fn">iter</span>(<span class="kw">lambda</span>: random.randint(<span class="num">1</span>,<span class="num">6</span>), <span class="num">6</span>)
+<span class="cmt"># yields rolls until 6 appears</span></pre></div></div>
+
+  <div class="method-card" data-search="pow modular exponentiation power builtin"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">pow(base, exp, mod)</span><span class="fn-desc">Efficient modular exponentiation</span><span class="complexity ologn">O(log n)</span></div><div class="card-body"><pre><span class="fn">pow</span>(<span class="num">2</span>, <span class="num">10</span>)       <span class="cmt"># 1024</span>
+<span class="fn">pow</span>(<span class="num">2</span>, <span class="num">10</span>, <span class="num">1000</span>) <span class="cmt"># 24 — (2^10) % 1000 — O(log n)</span>
+
+<span class="cmt"># Much faster than (2**10) % 1000 for large numbers</span>
+MOD = <span class="num">10</span>**<span class="num">9</span> + <span class="num">7</span>
+<span class="fn">pow</span>(<span class="num">2</span>, <span class="num">1000000</span>, MOD)  <span class="cmt"># instant with 3-arg form</span></pre></div></div>
+</section>
+
+<!-- ────── 11. ITERTOOLS ────── -->
+<section class="section" id="itertools">
+  <div class="section-header">
+    <span class="num">11</span>
+    <h2>itertools</h2>
+    <span class="badge">Iterator Building Blocks</span>
+  </div>
+  <div class="desc"><code>from itertools import ...</code> — Powerful iterator combinatorics and utilities.</div>
+
+  <div class="method-card" data-search="product cartesian cross itertools"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">product(*iterables, repeat=1)</span><span class="fn-desc">Cartesian product</span><span class="complexity other">O(n^k)</span></div><div class="card-body"><pre><span class="kw">from</span> itertools <span class="kw">import</span> product
+<span class="fn">list</span>(product([<span class="num">1</span>,<span class="num">2</span>], [<span class="str">'a'</span>,<span class="str">'b'</span>]))
+<span class="cmt"># [(1,'a'), (1,'b'), (2,'a'), (2,'b')]</span>
+<span class="fn">list</span>(product([<span class="num">1</span>,<span class="num">2</span>], repeat=<span class="num">2</span>))
+<span class="cmt"># [(1,1), (1,2), (2,1), (2,2)]</span></pre></div></div>
+
+  <div class="method-card" data-search="permutations arrangements order itertools"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">permutations(iter, r)</span><span class="fn-desc">All r-length arrangements</span><span class="complexity other">O(n!/(n-r)!)</span></div><div class="card-body"><pre><span class="kw">from</span> itertools <span class="kw">import</span> permutations
+<span class="fn">list</span>(permutations([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>], <span class="num">2</span>))
+<span class="cmt"># [(1,2), (1,3), (2,1), (2,3), (3,1), (3,2)]</span></pre></div></div>
+
+  <div class="method-card" data-search="combinations choose select itertools"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">combinations / combinations_with_replacement</span><span class="fn-desc">Choose r items (with/without replacement)</span><span class="complexity other">O(C(n,r))</span></div><div class="card-body"><pre><span class="kw">from</span> itertools <span class="kw">import</span> combinations, combinations_with_replacement
+<span class="fn">list</span>(combinations([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>], <span class="num">2</span>))
+<span class="cmt"># [(1,2), (1,3), (2,3)]</span>
+
+<span class="fn">list</span>(combinations_with_replacement([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>], <span class="num">2</span>))
+<span class="cmt"># [(1,1), (1,2), (1,3), (2,2), (2,3), (3,3)]</span></pre></div></div>
+
+  <div class="method-card" data-search="accumulate running total prefix sum itertools"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">accumulate(iter, func)</span><span class="fn-desc">Running total / accumulation</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="kw">from</span> itertools <span class="kw">import</span> accumulate
+<span class="fn">list</span>(accumulate([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>]))  <span class="cmt"># [1, 3, 6, 10]</span>
+<span class="fn">list</span>(accumulate([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>], func=<span class="kw">lambda</span> x,y: x*y))
+<span class="cmt"># [1, 2, 6]</span></pre></div></div>
+
+  <div class="method-card" data-search="groupby consecutive group itertools"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">groupby(iter, key)</span><span class="fn-desc">Group consecutive elements</span><span class="complexity on">O(n)</span></div><div class="card-body"><p>Input should be sorted by key first.</p><pre><span class="kw">from</span> itertools <span class="kw">import</span> groupby
+<span class="kw">for</span> key, group <span class="kw">in</span> groupby([<span class="num">1</span>,<span class="num">1</span>,<span class="num">2</span>,<span class="num">2</span>,<span class="num">3</span>]):
+    <span class="fn">print</span>(key, <span class="fn">list</span>(group))
+<span class="cmt"># 1 [1, 1]   2 [2, 2]   3 [3]</span></pre></div></div>
+
+  <div class="method-card" data-search="chain cycle repeat infinite itertools"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">chain / cycle / repeat</span><span class="fn-desc">Concatenate, loop, repeat</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="kw">from</span> itertools <span class="kw">import</span> chain, cycle, repeat
+
+<span class="fn">list</span>(chain([<span class="num">1</span>,<span class="num">2</span>], [<span class="num">3</span>,<span class="num">4</span>], [<span class="num">5</span>]))  <span class="cmt"># [1,2,3,4,5]</span>
+
+cyc = cycle([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>])
+[<span class="fn">next</span>(cyc) <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="num">7</span>)]
+<span class="cmt"># [1, 2, 3, 1, 2, 3, 1]</span>
+
+<span class="fn">list</span>(repeat(<span class="num">5</span>, <span class="num">3</span>))  <span class="cmt"># [5, 5, 5]</span></pre></div></div>
+
+  <div class="method-card" data-search="islice slice iterator lazy itertools"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">islice(iter, start, stop, step)</span><span class="fn-desc">Slice an iterator lazily</span><span class="complexity on">O(stop)</span></div><div class="card-body"><pre><span class="kw">from</span> itertools <span class="kw">import</span> islice
+<span class="fn">list</span>(islice(<span class="fn">range</span>(<span class="num">100</span>), <span class="num">5</span>))         <span class="cmt"># [0, 1, 2, 3, 4]</span>
+<span class="fn">list</span>(islice(<span class="fn">range</span>(<span class="num">100</span>), <span class="num">2</span>, <span class="num">8</span>))     <span class="cmt"># [2, 3, 4, 5, 6, 7]</span>
+<span class="fn">list</span>(islice(<span class="fn">range</span>(<span class="num">100</span>), <span class="num">0</span>, <span class="num">10</span>, <span class="num">2</span>)) <span class="cmt"># [0, 2, 4, 6, 8]</span></pre></div></div>
+
+  <div class="method-card" data-search="takewhile dropwhile condition stop itertools"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">takewhile / dropwhile</span><span class="fn-desc">Take/drop while predicate is true</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="kw">from</span> itertools <span class="kw">import</span> takewhile, dropwhile
+<span class="fn">list</span>(takewhile(<span class="kw">lambda</span> x: x < <span class="num">5</span>, [<span class="num">1</span>,<span class="num">3</span>,<span class="num">6</span>,<span class="num">2</span>,<span class="num">1</span>]))
+<span class="cmt"># [1, 3] — stops at first False</span>
+
+<span class="fn">list</span>(dropwhile(<span class="kw">lambda</span> x: x < <span class="num">5</span>, [<span class="num">1</span>,<span class="num">3</span>,<span class="num">6</span>,<span class="num">2</span>,<span class="num">1</span>]))
+<span class="cmt"># [6, 2, 1] — yields after first False</span></pre></div></div>
+
+  <div class="method-card" data-search="zip_longest fillvalue pad itertools"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">zip_longest(*iters, fillvalue)</span><span class="fn-desc">Zip with padding for unequal lengths</span><span class="complexity on">O(max(n,m))</span></div><div class="card-body"><pre><span class="kw">from</span> itertools <span class="kw">import</span> zip_longest
+<span class="fn">list</span>(zip_longest([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>], [<span class="str">'a'</span>,<span class="str">'b'</span>], fillvalue=<span class="str">'-'</span>))
+<span class="cmt"># [(1,'a'), (2,'b'), (3,'-')]</span>
+
+<span class="cmt"># Compare: zip stops at shortest</span>
+<span class="fn">list</span>(<span class="fn">zip</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>], [<span class="str">'a'</span>,<span class="str">'b'</span>]))
+<span class="cmt"># [(1,'a'), (2,'b')]</span></pre></div></div>
+
+  <div class="method-card" data-search="starmap unpack arguments apply itertools"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">starmap(func, iter)</span><span class="fn-desc">map() with unpacked argument tuples</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="kw">from</span> itertools <span class="kw">import</span> starmap
+<span class="fn">list</span>(starmap(<span class="fn">pow</span>, [(<span class="num">2</span>,<span class="num">3</span>), (<span class="num">3</span>,<span class="num">2</span>), (<span class="num">10</span>,<span class="num">3</span>)]))
+<span class="cmt"># [8, 9, 1000]</span>
+
+<span class="fn">list</span>(starmap(<span class="fn">max</span>, [(<span class="num">1</span>,<span class="num">5</span>), (<span class="num">3</span>,<span class="num">2</span>), (<span class="num">7</span>,<span class="num">4</span>)]))
+<span class="cmt"># [5, 3, 7]</span></pre></div></div>
+
+  <div class="method-card" data-search="count infinite counter enumerate itertools"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">count(start, step)</span><span class="fn-desc">Infinite counter</span><span class="complexity o1">O(1) per call</span></div><div class="card-body"><pre><span class="kw">from</span> itertools <span class="kw">import</span> count
+c = count(<span class="num">10</span>, <span class="num">2</span>)  <span class="cmt"># 10, 12, 14, 16, ...</span>
+<span class="fn">next</span>(c)  <span class="cmt"># 10</span>
+<span class="fn">next</span>(c)  <span class="cmt"># 12</span>
+
+<span class="cmt"># Useful with zip to add IDs</span>
+<span class="fn">list</span>(<span class="fn">zip</span>(count(<span class="num">1</span>), [<span class="str">'a'</span>,<span class="str">'b'</span>,<span class="str">'c'</span>]))  <span class="cmt"># [(1,'a'), (2,'b'), (3,'c')]</span></pre></div></div>
+
+  <div class="method-card" data-search="compress filter mask boolean select itertools"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">compress(data, selectors)</span><span class="fn-desc">Filter using boolean selectors</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="kw">from</span> itertools <span class="kw">import</span> compress
+<span class="fn">list</span>(compress([<span class="str">'a'</span>,<span class="str">'b'</span>,<span class="str">'c'</span>,<span class="str">'d'</span>], [<span class="num">1</span>,<span class="num">0</span>,<span class="num">1</span>,<span class="num">0</span>]))
+<span class="cmt"># ['a', 'c']</span></pre></div></div>
+
+  <div class="method-card" data-search="pairwise adjacent pairs sliding window itertools 3.10"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">pairwise(iter) (3.10+)</span><span class="fn-desc">Sliding window of adjacent pairs</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="kw">from</span> itertools <span class="kw">import</span> pairwise
+<span class="fn">list</span>(pairwise([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>]))
+<span class="cmt"># [(1,2), (2,3), (3,4)]</span>
+
+<span class="cmt"># For Python &lt; 3.10:</span>
+<span class="kw">def</span> <span class="fn">pairwise</span>(it):
+    a, b = tee(it)
+    <span class="fn">next</span>(b, <span class="kw">None</span>)
+    <span class="kw">return</span> <span class="fn">zip</span>(a, b)</pre></div></div>
+</section>
+
+<!-- ────── 12. BISECT ────── -->
+<section class="section" id="bisect">
+  <div class="section-header">
+    <span class="num">12</span>
+    <h2>bisect Module</h2>
+    <span class="badge">Binary Search · Sorted Lists</span>
+  </div>
+  <div class="desc"><code>import bisect</code> — Binary search operations on sorted lists. <strong>O(log n)</strong> search.</div>
+
+  <div class="method-card" data-search="bisect_left bisect_right insertion point binary search"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">bisect_left / bisect_right</span><span class="fn-desc">Find insertion point</span><span class="complexity ologn">O(log n)</span></div><div class="card-body"><pre><span class="kw">import</span> bisect
+arr = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">2</span>, <span class="num">4</span>, <span class="num">5</span>]
+bisect.bisect_left(arr, <span class="num">2</span>)   <span class="cmt"># 1 (leftmost)</span>
+bisect.bisect_right(arr, <span class="num">2</span>)  <span class="cmt"># 3 (rightmost)</span>
+bisect.bisect_left(arr, <span class="num">3</span>)   <span class="cmt"># 3 (where 3 would go)</span></pre></div></div>
+
+  <div class="method-card" data-search="insort_left insort_right insert sorted maintain"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">insort_left / insort_right</span><span class="fn-desc">Insert keeping sorted order</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>arr = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">4</span>, <span class="num">5</span>]
+bisect.insort_left(arr, <span class="num">3</span>)   <span class="cmt"># [1, 2, 3, 4, 5]</span>
+
+<span class="cmt"># Count occurrences of x in sorted array:</span>
+left = bisect.bisect_left(arr, x)
+right = bisect.bisect_right(arr, x)
+count = right - left</pre></div></div>
+</section>
+
+<!-- ────── 13. MATH ────── -->
+<section class="section" id="math">
+  <div class="section-header">
+    <span class="num">13</span>
+    <h2>math Module</h2>
+    <span class="badge">Mathematical Functions</span>
+  </div>
+  <div class="desc"><code>import math</code> — Core mathematical functions and constants.</div>
+
+  <div class="method-card" data-search="gcd lcm greatest common divisor least multiple math"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">gcd / lcm</span><span class="fn-desc">GCD and LCM</span><span class="complexity ologn">O(log min)</span></div><div class="card-body"><pre><span class="kw">import</span> math
+math.gcd(<span class="num">12</span>, <span class="num">18</span>)      <span class="cmt"># 6</span>
+math.gcd(<span class="num">12</span>, <span class="num">18</span>, <span class="num">24</span>)  <span class="cmt"># 6</span>
+math.lcm(<span class="num">12</span>, <span class="num">18</span>)      <span class="cmt"># 36 (Python 3.9+)</span></pre></div></div>
+
+  <div class="method-card" data-search="factorial sqrt ceil floor pow log math"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">factorial / sqrt / ceil / floor / pow / log</span><span class="fn-desc">Common math operations</span><span class="complexity on">varies</span></div><div class="card-body"><pre>math.factorial(<span class="num">5</span>)   <span class="cmt"># 120</span>
+math.sqrt(<span class="num">16</span>)       <span class="cmt"># 4.0</span>
+math.ceil(<span class="num">4.2</span>)      <span class="cmt"># 5</span>
+math.floor(<span class="num">4.8</span>)     <span class="cmt"># 4</span>
+<span class="fn">pow</span>(<span class="num">2</span>, <span class="num">1000</span>, <span class="num">10</span>**<span class="num">9</span>+<span class="num">7</span>)  <span class="cmt"># modular exponentiation O(log n)</span>
+math.log(<span class="num">8</span>, <span class="num">2</span>)      <span class="cmt"># 3.0</span></pre></div></div>
+
+  <div class="method-card" data-search="comb perm binomial permutation coefficient math"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">comb / perm (Python 3.8+)</span><span class="fn-desc">Binomial coefficient &amp; permutations</span><span class="complexity on">O(min(k,n-k))</span></div><div class="card-body"><pre>math.comb(<span class="num">5</span>, <span class="num">2</span>)  <span class="cmt"># 10 — C(5,2) = 5!/(2!·3!)</span>
+math.perm(<span class="num">5</span>, <span class="num">2</span>)  <span class="cmt"># 20 — P(5,2) = 5!/(5-2)!</span></pre></div></div>
+
+  <div class="method-card" data-search="isqrt integer square root truncated math"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">isqrt(n) (3.8+)</span><span class="fn-desc">Integer square root (exact, no float errors)</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>math.isqrt(<span class="num">10</span>)   <span class="cmt"># 3 (floor of sqrt)</span>
+math.isqrt(<span class="num">16</span>)   <span class="cmt"># 4 (exact)</span>
+math.isqrt(<span class="num">10</span>**<span class="num">18</span>)  <span class="cmt"># exact — no floating point error</span>
+
+<span class="cmt"># Check perfect square:</span>
+<span class="kw">def</span> <span class="fn">is_perfect_sq</span>(n):
+    r = math.isqrt(n)
+    <span class="kw">return</span> r * r == n</pre></div></div>
+
+  <div class="method-card" data-search="prod product multiply iterable math"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">prod(iterable, start=1) (3.8+)</span><span class="fn-desc">Product of all elements</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre>math.prod([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>])  <span class="cmt"># 24</span>
+math.prod([<span class="num">2</span>, <span class="num">3</span>], start=<span class="num">10</span>)  <span class="cmt"># 60</span>
+math.prod(<span class="fn">range</span>(<span class="num">1</span>, <span class="num">6</span>))  <span class="cmt"># 120 (5!)</span></pre></div></div>
+
+  <div class="method-card" data-search="isnan isinf isfinite nan infinity check math"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">isnan / isinf / isfinite</span><span class="fn-desc">Special float value checks</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>math.isnan(<span class="fn">float</span>(<span class="str">'nan'</span>))  <span class="cmt"># True</span>
+math.isinf(math.inf)       <span class="cmt"># True</span>
+math.isinf(-math.inf)      <span class="cmt"># True</span>
+math.isfinite(<span class="num">3.14</span>)        <span class="cmt"># True</span>
+math.isfinite(math.inf)    <span class="cmt"># False</span></pre></div></div>
+
+  <div class="method-card" data-search="sin cos tan asin acos atan atan2 trig trigonometry math"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">Trig: sin/cos/tan/atan2 &amp; degrees/radians</span><span class="fn-desc">Trigonometric functions</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>math.sin(math.pi / <span class="num">2</span>)  <span class="cmt"># 1.0</span>
+math.cos(<span class="num">0</span>)             <span class="cmt"># 1.0</span>
+math.atan2(<span class="num">1</span>, <span class="num">1</span>)        <span class="cmt"># 0.7854 (pi/4) — atan(y/x)</span>
+
+math.degrees(math.pi)   <span class="cmt"># 180.0</span>
+math.radians(<span class="num">180</span>)       <span class="cmt"># 3.14159...</span>
+
+<span class="cmt"># Distance between two points</span>
+math.dist((<span class="num">0</span>,<span class="num">0</span>), (<span class="num">3</span>,<span class="num">4</span>))  <span class="cmt"># 5.0 (Python 3.8+)</span>
+math.hypot(<span class="num">3</span>, <span class="num">4</span>)         <span class="cmt"># 5.0</span></pre></div></div>
+
+  <div class="method-card" data-search="constants pi e inf infinity tau math"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">Constants: pi, e, inf, tau</span><span class="fn-desc">Mathematical constants</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>math.pi   <span class="cmt"># 3.14159…</span>
+math.e    <span class="cmt"># 2.71828…</span>
+math.inf  <span class="cmt"># Infinity (useful for min/max init)</span>
+math.tau  <span class="cmt"># 2π</span></pre></div></div>
+</section>
+
+<!-- ────── 14. RANDOM ────── -->
+<section class="section" id="random">
+  <div class="section-header">
+    <span class="num">14</span>
+    <h2>random Module</h2>
+    <span class="badge">Pseudo-random Numbers</span>
+  </div>
+  <div class="desc"><code>import random</code> — Pseudo-random number generation.</div>
+
+  <div class="method-card" data-search="randint randrange choice random number"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">randint / randrange / choice</span><span class="fn-desc">Random integers &amp; selection</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="kw">import</span> random
+random.randint(<span class="num">1</span>, <span class="num">10</span>)     <span class="cmt"># [1, 10] inclusive</span>
+random.randrange(<span class="num">0</span>, <span class="num">10</span>)   <span class="cmt"># [0, 10) exclusive end</span>
+random.choice([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>])   <span class="cmt"># random element</span></pre></div></div>
+
+  <div class="method-card" data-search="shuffle sample seed uniform random"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">shuffle / sample / seed / uniform</span><span class="fn-desc">Shuffle, sample, reproducibility</span><span class="complexity on">O(n)/O(k)</span></div><div class="card-body"><pre>arr = [<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>]
+random.shuffle(arr)           <span class="cmt"># in-place shuffle O(n)</span>
+random.sample(arr, <span class="num">3</span>)        <span class="cmt"># 3 unique elements O(k)</span>
+random.uniform(<span class="num">1.0</span>, <span class="num">10.0</span>)  <span class="cmt"># random float</span>
+
+random.seed(<span class="num">42</span>)  <span class="cmt"># set seed for reproducibility</span></pre></div></div>
+
+  <div class="method-card" data-search="random float uniform number zero one"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">random()</span><span class="fn-desc">Random float in [0.0, 1.0)</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>random.random()  <span class="cmt"># e.g. 0.37444887175646646</span>
+
+<span class="cmt"># Scale to custom range [a, b)</span>
+a, b = <span class="num">5</span>, <span class="num">10</span>
+val = a + (b - a) * random.random()  <span class="cmt"># [5, 10)</span></pre></div></div>
+
+  <div class="method-card" data-search="choices weighted selection sample replacement random"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">choices(pop, weights, k) (3.6+)</span><span class="fn-desc">Weighted random selection with replacement</span><span class="complexity on">O(k)</span></div><div class="card-body"><pre><span class="cmt"># Weighted selection (with replacement)</span>
+random.choices([<span class="str">'a'</span>,<span class="str">'b'</span>,<span class="str">'c'</span>], weights=[<span class="num">10</span>,<span class="num">1</span>,<span class="num">1</span>], k=<span class="num">5</span>)
+<span class="cmt"># e.g. ['a', 'a', 'c', 'a', 'a'] — 'a' much more likely</span>
+
+<span class="cmt"># Compare:
+# sample(pop, k) — without replacement, uniform
+# choices(pop, k=k) — with replacement, can be weighted</span></pre></div></div>
+
+  <div class="method-card" data-search="gauss normalvariate gaussian normal distribution random"><div class="card-head" onclick="toggle(this)"><span class="chevron">&#9654;</span><span class="fn-name">gauss(mu, sigma)</span><span class="fn-desc">Gaussian/normal distribution</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre>random.gauss(<span class="num">0</span>, <span class="num">1</span>)       <span class="cmt"># standard normal distribution</span>
+random.gauss(<span class="num">100</span>, <span class="num">15</span>)    <span class="cmt"># mean=100, stddev=15</span>
+random.normalvariate(<span class="num">0</span>, <span class="num">1</span>) <span class="cmt"># thread-safe version</span></pre></div></div>
+</section>
+
+<!-- ────── 15. PERFORMANCE ────── -->
+<section class="section" id="performance">
+  <div class="section-header">
+    <span class="num">15</span>
+    <h2>Time &amp; Performance</h2>
+    <span class="badge">Profiling · Caching</span>
+  </div>
+  <div class="desc">Tools for measuring performance and caching function results.</div>
+
+  <div class="method-card" data-search="time perf_counter measure elapsed performance"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">time.time() / time.perf_counter()</span><span class="fn-desc">Measure elapsed time</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="kw">import</span> time
+start = time.perf_counter()
+<span class="cmt"># ... code ...</span>
+elapsed = time.perf_counter() - start</pre></div></div>
+
+  <div class="method-card" data-search="lru_cache cache memoization decorator functools"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">@lru_cache / @cache</span><span class="fn-desc">Memoization decorators</span><span class="complexity o1">O(1) cached</span></div><div class="card-body"><pre><span class="kw">from</span> functools <span class="kw">import</span> lru_cache, cache
+
+<span class="kw">@lru_cache</span>(maxsize=<span class="kw">None</span>)
+<span class="kw">def</span> <span class="fn">fibonacci</span>(n):
+    <span class="kw">if</span> n < <span class="num">2</span>: <span class="kw">return</span> n
+    <span class="kw">return</span> fibonacci(n-<span class="num">1</span>) + fibonacci(n-<span class="num">2</span>)
+
+fibonacci(<span class="num">30</span>)  <span class="cmt"># Fast with memoization</span>
+fibonacci.cache_info()   <span class="cmt"># check stats</span>
+fibonacci.cache_clear()  <span class="cmt"># clear cache</span>
+
+<span class="cmt"># Python 3.9+: simpler unlimited cache</span>
+<span class="kw">@cache</span>
+<span class="kw">def</span> <span class="fn">fib</span>(n):
+    <span class="kw">if</span> n < <span class="num">2</span>: <span class="kw">return</span> n
+    <span class="kw">return</span> fib(n-<span class="num">1</span>) + fib(n-<span class="num">2</span>)</pre></div></div>
+</section>
+
+<!-- ────── COMPLEXITY TABLE ────── -->
+<section class="section" id="complexity">
+  <div class="section-header">
+    <span class="num">📊</span>
+    <h2>Time Complexity Summary</h2>
+  </div>
+  <div style="overflow-x:auto">
+  <table class="complexity-table">
+    <thead>
+      <tr><th>Data Structure</th><th>Access</th><th>Insert</th><th>Delete</th><th>Search</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="ds-name">List</td><td><span class="complexity o1">O(1)</span></td><td><span class="complexity on">O(n)</span></td><td><span class="complexity on">O(n)</span></td><td><span class="complexity on">O(n)</span></td></tr>
+      <tr><td class="ds-name">Tuple</td><td><span class="complexity o1">O(1)</span></td><td>N/A</td><td>N/A</td><td><span class="complexity on">O(n)</span></td></tr>
+      <tr><td class="ds-name">Set</td><td><span class="complexity o1">O(1)</span></td><td><span class="complexity o1">O(1)</span></td><td><span class="complexity o1">O(1)</span></td><td><span class="complexity o1">O(1)</span></td></tr>
+      <tr><td class="ds-name">Dictionary</td><td><span class="complexity o1">O(1)</span></td><td><span class="complexity o1">O(1)</span></td><td><span class="complexity o1">O(1)</span></td><td><span class="complexity o1">O(1)</span></td></tr>
+      <tr><td class="ds-name">Deque</td><td><span class="complexity o1">O(1)</span></td><td><span class="complexity o1">O(1)*</span></td><td><span class="complexity o1">O(1)*</span></td><td><span class="complexity on">O(n)</span></td></tr>
+      <tr><td class="ds-name">Heap</td><td><span class="complexity o1">O(1) min</span></td><td><span class="complexity ologn">O(log n)</span></td><td><span class="complexity ologn">O(log n)</span></td><td><span class="complexity on">O(n)</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="margin-top:8px;font-size:.78rem;color:var(--text-muted)">* Deque O(1) insert/delete at both ends. Middle operations are O(n).</p>
+</section>
+
+<!-- ────── COMMON PATTERNS ────── -->
+<section class="section" id="patterns">
+  <div class="section-header">
+    <span class="num">💡</span>
+    <h2>Common DSA Patterns</h2>
+  </div>
+  <div class="pattern-grid">
+    <div class="pattern-card"><div class="p-num">1</div><div class="p-text"><strong>Count elements:</strong> <code>Counter</code> or <code>defaultdict(int)</code></div></div>
+    <div class="pattern-card"><div class="p-num">2</div><div class="p-text"><strong>Group elements:</strong> <code>defaultdict(list)</code> or <code>groupby</code></div></div>
+    <div class="pattern-card"><div class="p-num">3</div><div class="p-text"><strong>Order by frequency:</strong> <code>Counter.most_common()</code></div></div>
+    <div class="pattern-card"><div class="p-num">4</div><div class="p-text"><strong>BFS / Priority:</strong> <code>deque</code> or <code>heapq</code></div></div>
+    <div class="pattern-card"><div class="p-num">5</div><div class="p-text"><strong>Check duplicates:</strong> <code>set</code></div></div>
+    <div class="pattern-card"><div class="p-num">6</div><div class="p-text"><strong>Fast lookup:</strong> <code>dict</code> or <code>set</code></div></div>
+    <div class="pattern-card"><div class="p-num">7</div><div class="p-text"><strong>Sorted access:</strong> <code>heapq</code> or <code>bisect</code></div></div>
+    <div class="pattern-card"><div class="p-num">8</div><div class="p-text"><strong>Sliding window:</strong> <code>deque</code></div></div>
+    <div class="pattern-card"><div class="p-num">9</div><div class="p-text"><strong>Multi-key sort:</strong> <code>sorted</code> with <code>key</code></div></div>
+    <div class="pattern-card"><div class="p-num">10</div><div class="p-text"><strong>Memoization:</strong> <code>@lru_cache</code></div></div>
+  </div>
+</section>
+
+<footer style="text-align:center;padding:32px 0 16px;color:var(--text-muted);font-size:.8rem;border-top:1px solid var(--surface2);margin-top:40px">
+  Python DSA Reference · Based on Python 3.9+ · <a href="https://docs.python.org/3/library/" style="color:var(--accent)">Official Docs ↗</a>
+</footer>
+
+</main>
+
+<!-- ═══ BACK TO TOP ═══ -->
+<button class="btt" id="btt" onclick="window.scrollTo({top:0})" title="Back to top">↑</button>
+
+<script>
+// ── Toggle method cards ──
+function toggle(head) {
+  head.parentElement.classList.toggle('open');
+}
+
+// ── Expand all on page load? No — keep collapsed for speed ──
+
+// ── Active sidebar link tracking ──
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('.sidebar a');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const link = document.querySelector(`.sidebar a[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-80px 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// ── Close mobile sidebar on link click ──
+navLinks.forEach(l => l.addEventListener('click', () => {
+  document.getElementById('sidebar').classList.remove('open');
+}));
+
+// ── Back to top button ──
+window.addEventListener('scroll', () => {
+  document.getElementById('btt').classList.toggle('show', window.scrollY > 400);
+});
+
+// ── Search ──
+const searchInput = document.getElementById('searchInput');
+const searchOverlay = document.getElementById('searchOverlay');
+const searchResults = document.getElementById('searchResults');
+
+// Build search index
+const searchIndex = [];
+document.querySelectorAll('.method-card').forEach(card => {
+  const section = card.closest('.section');
+  const sectionTitle = section.querySelector('h2')?.textContent || '';
+  const fnName = card.querySelector('.fn-name')?.textContent || '';
+  const fnDesc = card.querySelector('.fn-desc')?.textContent || '';
+  const searchData = card.dataset.search || '';
+  const bodyText = card.querySelector('.card-body')?.textContent || '';
+  searchIndex.push({
+    el: card, sectionId: section.id, sectionTitle, fnName, fnDesc,
+    text: `${fnName} ${fnDesc} ${searchData} ${bodyText}`.toLowerCase()
+  });
+});
+
+function openSearch() { searchOverlay.classList.add('show'); searchInput.focus(); }
+function closeSearch() { searchOverlay.classList.remove('show'); searchResults.innerHTML = ''; }
+
+searchInput.addEventListener('input', function() {
+  const q = this.value.trim().toLowerCase();
+  if (!q) { closeSearch(); return; }
+  openSearch();
+  const results = searchIndex.filter(item => {
+    return q.split(/\s+/).every(word => item.text.includes(word));
+  }).slice(0, 15);
+
+  if (!results.length) {
+    searchResults.innerHTML = '<div class="sr-empty">No results found</div>';
+    return;
+  }
+  searchResults.innerHTML = results.map((r, i) => {
+    let title = r.fnName;
+    // highlight match
+    const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    title = title.replace(regex, '<mark>$1</mark>');
+    return `<div class="sr-item${i===0?' active':''}" data-section="${r.sectionId}" data-el-idx="${searchIndex.indexOf(r)}">
+      <span class="sr-title">${title}</span>
+      <span class="sr-section">${r.sectionTitle} · ${r.fnDesc}</span>
+    </div>`;
+  }).join('');
+
+  // Click to navigate
+  searchResults.querySelectorAll('.sr-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const idx = parseInt(item.dataset.elIdx);
+      const target = searchIndex[idx];
+      target.el.classList.add('open');
+      target.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      target.el.style.borderColor = 'var(--accent)';
+      setTimeout(() => target.el.style.borderColor = '', 2000);
+      closeSearch();
+      searchInput.value = '';
+    });
+  });
+});
+
+// Keyboard shortcut
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    searchInput.focus();
+    searchInput.select();
+  }
+  if (e.key === 'Escape') {
+    closeSearch();
+    searchInput.blur();
+  }
+});
+
+// Expand all / collapse all with keyboard
+document.addEventListener('keydown', e => {
+  if (e.key === 'e' && e.altKey) {
+    const cards = document.querySelectorAll('.method-card');
+    const allOpen = [...cards].every(c => c.classList.contains('open'));
+    cards.forEach(c => c.classList.toggle('open', !allOpen));
+  }
+});
+</script>
+</body>
+</html>

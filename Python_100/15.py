@@ -1,0 +1,13 @@
+a = int(input())
+aa = int(f"{a}{a}")
+aaa = int(f"{a}{a}{a}")
+aaaa = int(f"{a}{a}{a}{a}")
+print(a+aa+aaa+aaaa)
+
+# a = input()
+# n1 = int( "%s" % a )
+# n2 = int( "%s%s" % (a,a) )
+# n3 = int( "%s%s%s" % (a,a,a) )
+# n4 = int( "%s%s%s%s" % (a,a,a,a) )
+# print(n1,n2,n3,n4)
+# print(n1+n2+n3+n4)
