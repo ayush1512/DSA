@@ -278,7 +278,7 @@
 <!-- ═══ TOP BAR ═══ -->
 <header class="topbar">
   <button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Menu">☰</button>
-  <div class="logo">PyDSA<span> Reference</span></div>
+  <div class="logo">Python<span> Reference</span></div>
   <div class="search-box">
     <span class="icon">🔍</span>
     <input id="searchInput" type="text" placeholder="Search methods, modules, data structures…" autocomplete="off">
@@ -314,6 +314,13 @@
     <a href="#bisect"><span class="nav-icon">🔍</span> bisect</a>
     <a href="#math"><span class="nav-icon">📐</span> math</a>
     <a href="#random"><span class="nav-icon">🎲</span> random</a>
+    <a href="#fileio"><span class="nav-icon">📁</span> File I/O</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Advanced Features</div>
+    <a href="#generators"><span class="nav-icon">🔄</span> Generators</a>
+    <a href="#decorators"><span class="nav-icon">✨</span> Decorators</a>
+    <a href="#regex"><span class="nav-icon">🔍</span> Regex</a>
   </div>
   <div class="nav-group">
     <div class="nav-group-title">Reference</div>
@@ -1544,10 +1551,799 @@ random.gauss(<span class="num">100</span>, <span class="num">15</span>)    <span
 random.normalvariate(<span class="num">0</span>, <span class="num">1</span>) <span class="cmt"># thread-safe version</span></pre></div></div>
 </section>
 
-<!-- ────── 15. PERFORMANCE ────── -->
-<section class="section" id="performance">
+<!-- ────── 15. FILE HANDLING ────── -->
+<section class="section" id="fileio">
   <div class="section-header">
     <span class="num">15</span>
+    <h2>File Handling</h2>
+    <span class="badge">Read · Write · Context Manager</span>
+  </div>
+  <div class="desc">Built-in functions and methods for reading, writing, and managing files. Always prefer using <code>with</code> statement (context manager) to ensure files are properly closed.</div>
+
+  <div class="method-card" data-search="open file read write create mode"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">open(file, mode)</span><span class="fn-desc">Open a file and return a file object</span><span class="complexity o1">O(1)</span></div><div class="card-body"><p>Modes: <code>'r'</code> read (default), <code>'w'</code> write (truncate), <code>'a'</code> append, <code>'x'</code> exclusive create, <code>'b'</code> binary, <code>'t'</code> text (default), <code>'+'</code> read+write.</p><pre>f = open(<span class="str">'data.txt'</span>, <span class="str">'r'</span>)   <span class="cmt"># open for reading</span>
+f.close()                       <span class="cmt"># always close when done</span>
+
+<span class="cmt"># Preferred — auto-closes file</span>
+<span class="kw">with</span> open(<span class="str">'data.txt'</span>, <span class="str">'r'</span>) <span class="kw">as</span> f:
+    content = f.read()</pre></div></div>
+
+  <div class="method-card" data-search="read file entire content string"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">read(size=-1)</span><span class="fn-desc">Read entire file or up to size bytes</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="kw">with</span> open(<span class="str">'data.txt'</span>) <span class="kw">as</span> f:
+    all_text = f.read()        <span class="cmt"># entire file as one string</span>
+    f.seek(<span class="num">0</span>)                  <span class="cmt"># reset cursor to start</span>
+    chunk = f.read(<span class="num">100</span>)        <span class="cmt"># first 100 characters</span></pre></div></div>
+
+  <div class="method-card" data-search="readline file single line read"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">readline()</span><span class="fn-desc">Read a single line (including \n)</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="kw">with</span> open(<span class="str">'data.txt'</span>) <span class="kw">as</span> f:
+    first = f.readline()       <span class="cmt"># 'first line\n'</span>
+    second = f.readline()      <span class="cmt"># 'second line\n'</span>
+    <span class="cmt"># Returns '' at EOF</span></pre></div></div>
+
+  <div class="method-card" data-search="readlines file list lines read all"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">readlines()</span><span class="fn-desc">Read all lines into a list</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="kw">with</span> open(<span class="str">'data.txt'</span>) <span class="kw">as</span> f:
+    lines = f.readlines()      <span class="cmt"># ['line1\n', 'line2\n', ...]</span>
+
+<span class="cmt"># Memory-efficient alternative — iterate directly</span>
+<span class="kw">with</span> open(<span class="str">'data.txt'</span>) <span class="kw">as</span> f:
+    <span class="kw">for</span> line <span class="kw">in</span> f:
+        print(line.strip())    <span class="cmt"># process line by line</span></pre></div></div>
+
+  <div class="method-card" data-search="write file string output save"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">write(string)</span><span class="fn-desc">Write a string to the file</span><span class="complexity on">O(n)</span></div><div class="card-body"><p>Returns the number of characters written. Does NOT add a newline automatically.</p><pre><span class="kw">with</span> open(<span class="str">'output.txt'</span>, <span class="str">'w'</span>) <span class="kw">as</span> f:
+    f.write(<span class="str">'Hello, World!\n'</span>)  <span class="cmt"># write string</span>
+    f.write(<span class="str">'Line 2\n'</span>)          <span class="cmt"># append another line</span>
+
+<span class="cmt"># 'w' mode truncates (overwrites) existing content</span>
+<span class="cmt"># 'a' mode appends to end of file</span></pre></div></div>
+
+  <div class="method-card" data-search="writelines file list write multiple"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">writelines(lines)</span><span class="fn-desc">Write a list of strings to file</span><span class="complexity on">O(n)</span></div><div class="card-body"><p>Does NOT add newlines between strings — include <code>'\n'</code> yourself.</p><pre>lines = [<span class="str">'line 1\n'</span>, <span class="str">'line 2\n'</span>, <span class="str">'line 3\n'</span>]
+<span class="kw">with</span> open(<span class="str">'output.txt'</span>, <span class="str">'w'</span>) <span class="kw">as</span> f:
+    f.writelines(lines)</pre></div></div>
+
+  <div class="method-card" data-search="seek tell cursor position file pointer"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">seek(offset) / tell()</span><span class="fn-desc">Move / get file cursor position</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="kw">with</span> open(<span class="str">'data.txt'</span>) <span class="kw">as</span> f:
+    f.read(<span class="num">5</span>)              <span class="cmt"># read first 5 chars</span>
+    pos = f.tell()          <span class="cmt"># 5 — current position</span>
+    f.seek(<span class="num">0</span>)               <span class="cmt"># back to start</span>
+    f.seek(<span class="num">0</span>, <span class="num">2</span>)            <span class="cmt"># seek to end of file</span></pre></div></div>
+
+  <div class="method-card" data-search="truncate file shorten resize cut"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">truncate(size=None)</span><span class="fn-desc">Truncate file to at most size bytes</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="kw">with</span> open(<span class="str">'data.txt'</span>, <span class="str">'r+'</span>) <span class="kw">as</span> f:
+    f.truncate(<span class="num">10</span>)           <span class="cmt"># keep only first 10 bytes</span>
+    f.truncate()             <span class="cmt"># truncate at current position</span></pre></div></div>
+
+  <div class="method-card" data-search="flush file buffer write disk sync"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">flush()</span><span class="fn-desc">Flush internal write buffer to disk</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="kw">with</span> open(<span class="str">'log.txt'</span>, <span class="str">'a'</span>) <span class="kw">as</span> f:
+    f.write(<span class="str">'event logged\n'</span>)
+    f.flush()                <span class="cmt"># force write to disk immediately</span></pre></div></div>
+
+  <div class="method-card" data-search="close file release resource handle"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">close() / closed</span><span class="fn-desc">Close file / check if closed</span><span class="complexity o1">O(1)</span></div><div class="card-body"><p class="note">⚠ Always close files. Use <code>with</code> to auto-close.</p><pre>f = open(<span class="str">'data.txt'</span>)
+print(f.closed)    <span class="cmt"># False</span>
+f.close()
+print(f.closed)    <span class="cmt"># True</span></pre></div></div>
+
+  <div class="method-card" data-search="with context manager file auto close"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">with statement (Context Manager)</span><span class="fn-desc">Auto-close file on block exit</span><span class="complexity o1">O(1)</span></div><div class="card-body"><p>Ensures file is closed even if an exception occurs.</p><pre><span class="cmt"># Single file</span>
+<span class="kw">with</span> open(<span class="str">'data.txt'</span>) <span class="kw">as</span> f:
+    data = f.read()
+
+<span class="cmt"># Multiple files simultaneously</span>
+<span class="kw">with</span> open(<span class="str">'in.txt'</span>) <span class="kw">as</span> src, open(<span class="str">'out.txt'</span>, <span class="str">'w'</span>) <span class="kw">as</span> dst:
+    dst.write(src.read())</pre></div></div>
+
+  <div class="method-card" data-search="binary file read write bytes rb wb image"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">Binary mode ('rb' / 'wb')</span><span class="fn-desc">Read/write raw bytes (images, etc.)</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="cmt"># Read binary file</span>
+<span class="kw">with</span> open(<span class="str">'image.png'</span>, <span class="str">'rb'</span>) <span class="kw">as</span> f:
+    data = f.read()            <span class="cmt"># bytes object</span>
+
+<span class="cmt"># Write binary file</span>
+<span class="kw">with</span> open(<span class="str">'copy.png'</span>, <span class="str">'wb'</span>) <span class="kw">as</span> f:
+    f.write(data)</pre></div></div>
+
+  <div class="method-card" data-search="os path file exists isfile isdir check stat"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">os.path utilities</span><span class="fn-desc">Check existence, type, size of files</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="kw">import</span> os
+
+os.path.exists(<span class="str">'data.txt'</span>)    <span class="cmt"># True / False</span>
+os.path.isfile(<span class="str">'data.txt'</span>)    <span class="cmt"># True if file</span>
+os.path.isdir(<span class="str">'folder'</span>)       <span class="cmt"># True if directory</span>
+os.path.getsize(<span class="str">'data.txt'</span>)   <span class="cmt"># file size in bytes</span>
+os.path.abspath(<span class="str">'data.txt'</span>)   <span class="cmt"># absolute path</span>
+os.path.join(<span class="str">'dir'</span>, <span class="str">'file'</span>)  <span class="cmt"># 'dir/file' (OS-aware)</span></pre></div></div>
+
+  <div class="method-card" data-search="os file remove rename mkdir listdir delete directory"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">os file operations</span><span class="fn-desc">Remove, rename, create dirs, list files</span><span class="complexity o1">O(1)</span></div><div class="card-body"><pre><span class="kw">import</span> os
+
+os.remove(<span class="str">'old.txt'</span>)           <span class="cmt"># delete file</span>
+os.rename(<span class="str">'old.txt'</span>, <span class="str">'new.txt'</span>)  <span class="cmt"># rename / move</span>
+os.mkdir(<span class="str">'new_dir'</span>)            <span class="cmt"># create directory</span>
+os.makedirs(<span class="str">'a/b/c'</span>)           <span class="cmt"># create nested dirs</span>
+os.listdir(<span class="str">'.'</span>)                <span class="cmt"># list files in directory</span>
+os.getcwd()                     <span class="cmt"># current working directory</span></pre></div></div>
+
+  <div class="method-card" data-search="json file load dump read write serialize"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">json.load() / json.dump()</span><span class="fn-desc">Read/write JSON files</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="kw">import</span> json
+
+<span class="cmt"># Read JSON</span>
+<span class="kw">with</span> open(<span class="str">'config.json'</span>) <span class="kw">as</span> f:
+    data = json.load(f)        <span class="cmt"># dict / list</span>
+
+<span class="cmt"># Write JSON</span>
+<span class="kw">with</span> open(<span class="str">'config.json'</span>, <span class="str">'w'</span>) <span class="kw">as</span> f:
+    json.dump(data, f, indent=<span class="num">2</span>)
+
+<span class="cmt"># String ↔ JSON</span>
+s = json.dumps(data)           <span class="cmt"># dict → string</span>
+obj = json.loads(s)            <span class="cmt"># string → dict</span></pre></div></div>
+
+  <div class="method-card" data-search="csv file reader writer read write tabular"><div class="card-head" onclick="toggle(this)"><span class="chevron">▶</span><span class="fn-name">csv.reader() / csv.writer()</span><span class="fn-desc">Read/write CSV files</span><span class="complexity on">O(n)</span></div><div class="card-body"><pre><span class="kw">import</span> csv
+
+<span class="cmt"># Read CSV</span>
+<span class="kw">with</span> open(<span class="str">'data.csv'</span>) <span class="kw">as</span> f:
+    reader = csv.reader(f)
+    <span class="kw">for</span> row <span class="kw">in</span> reader:
+        print(row)             <span class="cmt"># ['col1', 'col2', ...]</span>
+
+<span class="cmt"># Write CSV</span>
+<span class="kw">with</span> open(<span class="str">'out.csv'</span>, <span class="str">'w'</span>, newline=<span class="str">''</span>) <span class="kw">as</span> f:
+    writer = csv.writer(f)
+    writer.writerow([<span class="str">'Name'</span>, <span class="str">'Age'</span>])
+    writer.writerows([[<span class="str">'Alice'</span>, <span class="num">30</span>], [<span class="str">'Bob'</span>, <span class="num">25</span>]])</pre></div></div>
+</section>
+
+<!-- ────── 16. GENERATORS ────── -->
+<section class="section" id="generators">
+  <div class="section-header">
+    <span class="num">16</span>
+    <h2>Generators</h2>
+    <span class="badge">yield · Memory-Efficient</span>
+  </div>
+  <div class="desc">Generator functions produce values lazily using <span class="fn-name">yield</span>, reducing memory usage and enabling infinite sequences.</div>
+
+  <div class="method-card" data-search="generator yield function definition lazy">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">Generator Function Definition</span>
+      <span class="fn-desc">Create generators with yield</span>
+      <span class="complexity o1">O(1) per value generated</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="cmt"># Generator — yields values lazily</span>
+<span class="kw">def</span> <span class="fn">count_up</span>(n):
+    x = <span class="num">0</span>
+    <span class="kw">while</span> x < n:
+        <span class="kw">yield</span> x
+        x += <span class="num">1</span>
+
+<span class="cmt"># Use in loop</span>
+<span class="kw">for</span> num <span class="kw">in</span> count_up(<span class="num">3</span>):  <span class="cmt"># outputs: 0, 1, 2</span>
+    <span class="fn">print</span>(num)
+
+<span class="cmt"># Get next value</span>
+gen = count_up(<span class="num">5</span>)
+<span class="fn">next</span>(gen)  <span class="cmt"># → 0</span>
+<span class="fn">next</span>(gen)  <span class="cmt"># → 1</span>
+
+<span class="cmt"># StopIteration when exhausted</span>
+<span class="kw">try</span>:
+    <span class="kw">while</span> <span class="kw">True</span>:
+        val = <span class="fn">next</span>(gen)
+<span class="kw">except</span> StopIteration:
+    <span class="kw">pass</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="generator expression comprehension memory efficient">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">Generator Expressions</span>
+      <span class="fn-desc">Lazy list/dict/set comprehensions</span>
+      <span class="complexity o1">O(1) per value</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="cmt"># Generator expression (like list comp but lazy)</span>
+gen = (x*<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>))
+<span class="fn">next</span>(gen)  <span class="cmt"># → 0</span>
+<span class="fn">next</span>(gen)  <span class="cmt"># → 2</span>
+
+<span class="cmt"># Consume all values</span>
+<span class="fn">list</span>(gen)  <span class="cmt"># → [4, 6, 8]</span>
+
+<span class="cmt"># Compare: list comp uses O(n) memory, gen uses O(1)</span>
+squares_list = [x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>**<span class="num">6</span>)]  <span class="cmt"># ~40MB</span>
+squares_gen = (x**<span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>**<span class="num">6</span>))   <span class="cmt"># minimal</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="generator send close throw state">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">Generator Methods (send/close/throw)</span>
+      <span class="fn-desc">Two-way communication with generators</span>
+      <span class="complexity o1">O(1)</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="kw">def</span> <span class="fn">echo_generator</span>():
+    value = <span class="kw">None</span>
+    <span class="kw">while</span> <span class="kw">True</span>:
+        value = <span class="kw">yield</span> value  <span class="cmt"># receives value from send()</span>
+
+gen = echo_generator()
+<span class="fn">next</span>(gen)  <span class="cmt"># prime the generator (run until first yield)</span>
+gen.<span class="fn">send</span>(<span class="num">42</span>)   <span class="cmt"># send value → receives 42</span>
+gen.<span class="fn">send</span>(<span class="num">100</span>) <span class="cmt"># send value → receives 100</span>
+
+<span class="cmt"># Throw exception into generator</span>
+<span class="kw">def</span> <span class="fn">safe_gen</span>():
+    <span class="kw">try</span>:
+        <span class="kw">yield</span> <span class="num">1</span>
+        <span class="kw">yield</span> <span class="num">2</span>
+    <span class="kw">except</span> ValueError:
+        <span class="fn">print</span>(<span class="str">"Caught error"</span>)
+
+gen = safe_gen()
+<span class="fn">next</span>(gen)  <span class="cmt"># 1</span>
+gen.<span class="fn">throw</span>(ValueError)  <span class="cmt"># inject exception</span>
+
+<span class="cmt"># Close generator (raises GeneratorExit)</span>
+gen.<span class="fn">close</span>()</pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="generator infinite sequence fibonacci lazy evaluation">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">Infinite Sequences & Lazy Evaluation</span>
+      <span class="fn-desc">Infinite generators and lazy processing</span>
+      <span class="complexity other">Varies</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="cmt"># Infinite generator</span>
+<span class="kw">def</span> <span class="fn">infinite_count</span>(start=<span class="num">0</span>):
+    <span class="kw">while</span> <span class="kw">True</span>:
+        <span class="kw">yield</span> start
+        start += <span class="num">1</span>
+
+<span class="kw">from</span> itertools <span class="kw">import</span> islice
+<span class="fn">list</span>(islice(infinite_count(), <span class="num">5</span>))  <span class="cmt"># [0, 1, 2, 3, 4]</span>
+
+<span class="cmt"># Fibonacci generator</span>
+<span class="kw">def</span> <span class="fn">fibonacci</span>():
+    a, b = <span class="num">0</span>, <span class="num">1</span>
+    <span class="kw">while</span> <span class="kw">True</span>:
+        <span class="kw">yield</span> a
+        a, b = b, a + b
+
+<span class="cmt"># Use first 10 Fibonacci numbers</span>
+fibs = islice(fibonacci(), <span class="num">10</span>)
+<span class="fn">sum</span>(fibs)  <span class="cmt"># → 143</span>
+
+<span class="cmt"># Lazy pipeline: filter → map → sum</span>
+<span class="kw">def</span> <span class="fn">data_stream</span>():
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1000000</span>):
+        <span class="kw">yield</span> i
+
+pipeline = <span class="fn">map</span>(<span class="kw">lambda</span> x: x*<span class="num">2</span>, <span class="fn">filter</span>(<span class="kw">lambda</span> x: x%<span class="num">2</span>==<span class="num">0</span>, data_stream()))
+<span class="fn">sum</span>(islice(pipeline, <span class="num">1000</span>))  <span class="cmt"># only processes what's needed!</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ────── 17. DECORATORS ────── -->
+<section class="section" id="decorators">
+  <div class="section-header">
+    <span class="num">17</span>
+    <h2>Decorators</h2>
+    <span class="badge">@decorator · Metaprogramming</span>
+  </div>
+  <div class="desc">Decorators wrap functions/classes to modify behavior. Powerful for logging, timing, caching, and cross-cutting concerns.</div>
+
+  <div class="method-card" data-search="decorator function wrapper syntax syntactic sugar">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">Function Decorators (Basic)</span>
+      <span class="fn-desc">Wrap functions with behavior</span>
+      <span class="complexity o1">O(1) wrapper</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="cmt"># Simple decorator</span>
+<span class="kw">def</span> <span class="fn">my_decorator</span>(func):
+    <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):
+        <span class="fn">print</span>(<span class="str">"Before function"</span>)
+        result = func(*args, **kwargs)
+        <span class="fn">print</span>(<span class="str">"After function"</span>)
+        <span class="kw">return</span> result
+    <span class="kw">return</span> wrapper
+
+<span class="kw">@my_decorator</span>
+<span class="kw">def</span> <span class="fn">greet</span>(name):
+    <span class="kw">return</span> <span class="str">f"Hello, {name}!"</span>
+
+<span class="cmt"># Equivalent to: greet = my_decorator(greet)</span>
+greet(<span class="str">"Alice"</span>)
+
+<span class="cmt"># Multiple decorators (bottom-up execution order)</span>
+<span class="kw">@decorator1</span>
+<span class="kw">@decorator2</span>
+<span class="kw">@decorator3</span>
+<span class="kw">def</span> <span class="fn">my_func</span>(): <span class="kw">pass</span>  <span class="cmt"># decorator3 → decorator2 → decorator1</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="decorator functools wraps preserve metadata">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">Preserving Metadata (@wraps)</span>
+      <span class="fn-desc">Keep original function info</span>
+      <span class="complexity o1">O(1)</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="kw">from</span> functools <span class="kw">import</span> wraps
+
+<span class="kw">def</span> <span class="fn">my_decorator</span>(func):
+    <span class="kw">@wraps</span>(func)  <span class="cmt"># copy __name__, __doc__, etc.</span>
+    <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):
+        <span class="cmt">"""Wrapper docstring"""</span>
+        <span class="kw">return</span> func(*args, **kwargs)
+    <span class="kw">return</span> wrapper
+
+<span class="kw">@my_decorator</span>
+<span class="kw">def</span> <span class="fn">example</span>():
+    <span class="cmt">"""Original docstring"""</span>
+    <span class="kw">pass</span>
+
+example.__name__   <span class="cmt"># → "example" (not "wrapper")</span>
+example.__doc__    <span class="cmt"># → "Original docstring"</span>
+example.__wrapped__  <span class="cmt"># → original undecorated function</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="decorator with arguments parameterized configurable">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">Decorators with Arguments</span>
+      <span class="fn-desc">Parameterized decorators</span>
+      <span class="complexity o1">O(1)</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="cmt"># Decorator factory (accepts arguments)</span>
+<span class="kw">def</span> <span class="fn">repeat</span>(times):
+    <span class="cmt"># Returns a decorator</span>
+    <span class="kw">def</span> <span class="fn">decorator</span>(func):
+        <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):
+            result = <span class="kw">None</span>
+            <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(times):
+                result = func(*args, **kwargs)
+            <span class="kw">return</span> result
+        <span class="kw">return</span> wrapper
+    <span class="kw">return</span> decorator
+
+<span class="kw">@repeat</span>(times=<span class="num">3</span>)
+<span class="kw">def</span> <span class="fn">say_hello</span>():
+    <span class="fn">print</span>(<span class="str">"Hello"</span>)
+
+say_hello()  <span class="cmt"># prints "Hello" 3 times</span>
+
+<span class="cmt"># Logging decorator with level</span>
+<span class="kw">def</span> <span class="fn">log</span>(level=<span class="str">"INFO"</span>):
+    <span class="kw">def</span> <span class="fn">decorator</span>(func):
+        <span class="kw">@wraps</span>(func)
+        <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):
+            <span class="fn">print</span>(<span class="str">f"[{level}] Calling {func.__name__}"</span>)
+            <span class="kw">return</span> func(*args, **kwargs)
+        <span class="kw">return</span> wrapper
+    <span class="kw">return</span> decorator
+
+<span class="kw">@log</span>(level=<span class="str">"DEBUG"</span>)
+<span class="kw">def</span> <span class="fn">process</span>(data): <span class="kw">pass</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="class decorator classmethod staticmethod property">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">Class Decorators & Built-in Decorators</span>
+      <span class="fn-desc">@classmethod, @staticmethod, @property</span>
+      <span class="complexity o1">O(1)</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="cmt"># @staticmethod — doesn't receive instance/class</span>
+<span class="kw">class</span> <span class="fn">Math</span>:
+    <span class="kw">@staticmethod</span>
+    <span class="kw">def</span> <span class="fn">add</span>(a, b): <span class="kw">return</span> a + b
+
+Math.add(<span class="num">2</span>, <span class="num">3</span>)  <span class="cmt"># → 5</span>
+
+<span class="cmt"># @classmethod — receives class as first arg</span>
+<span class="kw">class</span> <span class="fn">Counter</span>:
+    count = <span class="num">0</span>
+    @classmethod
+    <span class="kw">def</span> <span class="fn">increment</span>(cls):
+        cls.count += <span class="num">1</span>
+
+Counter.<span class="fn">increment</span>()
+
+<span class="cmt"># @property — access like attribute, not method</span>
+<span class="kw">class</span> <span class="fn">Circle</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, radius):
+        self.radius = radius
+
+    <span class="kw">@property</span>
+    <span class="kw">def</span> <span class="fn">area</span>(self):
+        <span class="kw">return</span> <span class="num">3.14</span> * self.radius ** <span class="num">2</span>
+
+    <span class="kw">@area.setter</span>
+    <span class="kw">def</span> <span class="fn">area</span>(self, value):
+        self.radius = (value / <span class="num">3.14</span>) ** <span class="num">0.5</span>
+
+c = Circle(<span class="num">5</span>)
+c.area  <span class="cmt"># → 78.5 (called as property, not method)</span>
+c.area = <span class="num">100</span>  <span class="cmt"># triggers setter</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="decorator class decorator dataclass">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">Class Decorators (@dataclass)</span>
+      <span class="fn-desc">Auto-generate __init__, __repr__, etc.</span>
+      <span class="complexity o1">O(n) for generation</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass, field
+
+<span class="kw">@dataclass</span>
+<span class="kw">class</span> <span class="fn">Person</span>:
+    name: str
+    age: int
+    email: str = <span class="str">""</span>  <span class="cmt"># default</span>
+    skills: <span class="fn">list</span> = <span class="fn">field</span>(default_factory=<span class="fn">list</span>)
+
+<span class="cmt"># Auto-generates: __init__, __repr__, __eq__</span>
+p = Person(<span class="str">"Alice"</span>, <span class="num">30</span>)
+<span class="fn">print</span>(p)  <span class="cmt"># Person(name='Alice', age=30, email='', skills=[])</span>
+
+<span class="cmt"># Frozen dataclass (immutable)</span>
+<span class="kw">@dataclass</span>(frozen=<span class="kw">True</span>)
+<span class="kw">class</span> <span class="fn">Point</span>:
+    x: <span class="type">int</span>
+    y: <span class="type">int</span>
+
+p = Point(<span class="num">1</span>, <span class="num">2</span>)
+p.x = <span class="num">5</span>  <span class="cmt"># raises FrozenInstanceError</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="decorator practical example timing memoization retry">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">Practical Examples (Timing, Retry, Validation)</span>
+      <span class="fn-desc">Real-world decorator patterns</span>
+      <span class="complexity other">Varies</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="cmt"># Timing decorator</span>
+<span class="kw">import</span> time
+<span class="kw">def</span> <span class="fn">timer</span>(func):
+    <span class="kw">@wraps</span>(func)
+    <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        elapsed = time.perf_counter() - start
+        <span class="fn">print</span>(<span class="str">f"{func.__name__} took {elapsed:.4f}s"</span>)
+        <span class="kw">return</span> result
+    <span class="kw">return</span> wrapper
+
+<span class="cmt"># Retry decorator</span>
+<span class="kw">def</span> <span class="fn">retry</span>(max_attempts=<span class="num">3</span>, delay=<span class="num">1</span>):
+    <span class="kw">def</span> <span class="fn">decorator</span>(func):
+        <span class="kw">@wraps</span>(func)
+        <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):
+            <span class="kw">for</span> attempt <span class="kw">in</span> <span class="fn">range</span>(max_attempts):
+                <span class="kw">try</span>:
+                    <span class="kw">return</span> func(*args, **kwargs)
+                <span class="kw">except</span> Exception <span class="kw">as</span> e:
+                    <span class="kw">if</span> attempt == max_attempts - <span class="num">1</span>:
+                        <span class="kw">raise</span>
+                    time.sleep(delay)
+        <span class="kw">return</span> wrapper
+    <span class="kw">return</span> decorator
+
+<span class="kw">@retry</span>(max_attempts=<span class="num">3</span>, delay=<span class="num">2</span>)
+<span class="kw">def</span> <span class="fn">unstable_api_call</span>():
+    <span class="cmt"># auto-retries up to 3 times with 2s delay</span>
+    <span class="kw">pass</span>
+
+<span class="cmt"># Validation decorator</span>
+<span class="kw">def</span> <span class="fn">validate_args</span>(**validators):
+    <span class="kw">def</span> <span class="fn">decorator</span>(func):
+        <span class="kw">@wraps</span>(func)
+        <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):
+            <span class="kw">for</span> name, validator <span class="kw">in</span> validators.items():
+                <span class="kw">if</span> name <span class="kw">in</span> kwargs:
+                    <span class="kw">if</span> <span class="kw">not</span> validator(kwargs[name]):
+                        <span class="kw">raise</span> ValueError(<span class="str">f"Invalid {name}"</span>)
+            <span class="kw">return</span> func(*args, **kwargs)
+        <span class="kw">return</span> wrapper
+    <span class="kw">return</span> decorator
+
+<span class="kw">@validate_args</span>(age=<span class="kw">lambda</span> x: <span class="num">0</span> < x < <span class="num">150</span>)
+<span class="kw">def</span> <span class="fn">create_user</span>(name, age):
+    <span class="kw">pass</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ────── 18. REGEX (REGULAR EXPRESSIONS) ────── -->
+<section class="section" id="regex">
+  <div class="section-header">
+    <span class="num">18</span>
+    <h2>Regex (Regular Expressions)</h2>
+    <span class="badge">re · Pattern Matching</span>
+  </div>
+  <div class="desc">Pattern matching and text manipulation using regular expressions. Powerful for validation, extraction, and searching.</div>
+
+  <div class="method-card" data-search="regex pattern syntax basics dot star plus question bracket">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">Regex Pattern Syntax (Basics)</span>
+      <span class="fn-desc">Metacharacters and pattern components</span>
+      <span class="complexity other">Reference</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="cmt"># Basic metacharacters:</span>
+.       <span class="cmt">any character except newline</span>
+*       <span class="cmt">0 or more of previous</span>
++       <span class="cmt">1 or more of previous</span>
+?       <span class="cmt">0 or 1 of previous</span>
+{n}     <span class="cmt">exactly n occurrences</span>
+{n,m}   <span class="cmt">n to m occurrences</span>
+^       <span class="cmt">start of line/string</span>
+$       <span class="cmt">end of line/string</span>
+|       <span class="cmt">OR (alternation)</span>
+()      <span class="cmt">capture group</span>
+[]      <span class="cmt">character class</span>
+\       <span class="cmt">escape special character</span>
+
+<span class="cmt"># Character classes:</span>
+[abc]       <span class="cmt">a, b, or c</span>
+[a-z]       <span class="cmt">a through z (lowercase)</span>
+[A-Z]       <span class="cmt">A through Z (uppercase)</span>
+[0-9]       <span class="cmt">any digit</span>
+[^abc]      <span class="cmt">NOT a, b, or c (negation)</span>
+
+<span class="cmt"># Shortcuts:</span>
+\d      <span class="cmt">digit [0-9]</span>
+\D      <span class="cmt">non-digit [^0-9]</span>
+\w      <span class="cmt">word character [a-zA-Z0-9_]</span>
+\W      <span class="cmt">non-word character</span>
+\s      <span class="cmt">whitespace (space, tab, newline)</span>
+\S      <span class="cmt">non-whitespace</span>
+\.      <span class="cmt">literal dot (escaped)</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="re match search findall regex search functions">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">search / match / findall / finditer</span>
+      <span class="fn-desc">Find patterns in strings</span>
+      <span class="complexity on">O(n*m) worst case</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="kw">import</span> re
+
+text = <span class="str">"Email: user@example.com, Phone: 123-456-7890"</span>
+
+<span class="cmt"># search() - find first occurrence</span>
+match = re.<span class="fn">search</span>(r<span class="str">'\d{3}-\d{3}-\d{4}'</span>, text)
+<span class="kw">if</span> match:
+    <span class="fn">print</span>(match.group())  <span class="cmt"># → "123-456-7890"</span>
+    <span class="fn">print</span>(match.start())  <span class="cmt"># → 36</span>
+    <span class="fn">print</span>(match.end())    <span class="cmt"># → 48</span>
+
+<span class="cmt"># match() - match at START of string only</span>
+match = re.<span class="fn">match</span>(r<span class="str">'^[a-z]+'</span>, <span class="str">"hello world"</span>)
+<span class="kw">if</span> match:
+    <span class="fn">print</span>(match.group())  <span class="cmt"># → "hello"</span>
+
+<span class="cmt"># findall() - find ALL occurrences (return list)</span>
+emails = re.<span class="fn">findall</span>(r<span class="str">'\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b'</span>, text)
+<span class="cmt"># → ['user@example.com']</span>
+
+<span class="cmt"># finditer() - find all (return iterator of match objects)</span>
+<span class="kw">for</span> m <span class="kw">in</span> re.<span class="fn">finditer</span>(r<span class="str">'\d+'</span>, <span class="str">"123 abc 456 def 789"</span>):
+    <span class="fn">print</span>(m.group())  <span class="cmt"># → "123", "456", "789"</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="re sub subn replace substitution regex">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">sub() / subn() - Replace</span>
+      <span class="fn-desc">Replace matching patterns</span>
+      <span class="complexity on">O(n*m)</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="cmt"># sub() - replace first occurrence (or all if count=0)</span>
+text = <span class="str">"hello WORLD hello python"</span>
+result = re.<span class="fn">sub</span>(r<span class="str">'hello'</span>, <span class="str">'HI'</span>, text, count=<span class="num">1</span>)
+<span class="cmt"># → "HI WORLD hello python"</span>
+
+<span class="cmt"># Replace all occurrences</span>
+result = re.<span class="fn">sub</span>(r<span class="str">'hello'</span>, <span class="str">'HI'</span>, text)
+<span class="cmt"># → "HI WORLD HI python"</span>
+
+<span class="cmt"># Case-insensitive replacement</span>
+result = re.<span class="fn">sub</span>(r<span class="str">'hello'</span>, <span class="str">'HI'</span>, text, flags=re.IGNORECASE)
+<span class="cmt"># → "HI WORLD HI python"</span>
+
+<span class="cmt"># subn() - replace and return count</span>
+result, count = re.<span class="fn">subn</span>(r<span class="str">'\d+'</span>, <span class="str">'X'</span>, <span class="str">"123 abc 456"</span>)
+<span class="cmt"># result = "X abc X", count = 2</span>
+
+<span class="cmt"># Replace using function</span>
+<span class="kw">def</span> <span class="fn">double_number</span>(match):
+    num = <span class="fn">int</span>(match.group())
+    <span class="kw">return</span> <span class="fn">str</span>(num * <span class="num">2</span>)
+
+result = re.<span class="fn">sub</span>(r<span class="str">'\d+'</span>, double_number, <span class="str">"123 abc 456"</span>)
+<span class="cmt"># → "246 abc 912"</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="re split regex split string">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">split() - Split by Pattern</span>
+      <span class="fn-desc">Split string using regex pattern</span>
+      <span class="complexity on">O(n)</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="cmt"># split() - split by pattern</span>
+text = <span class="str">"apple,banana;orange:grape"</span>
+parts = re.<span class="fn">split</span>(r<span class="str">'[,;:]'</span>, text)
+<span class="cmt"># → ['apple', 'banana', 'orange', 'grape']</span>
+
+<span class="cmt"># Split with limit</span>
+parts = re.<span class="fn">split</span>(r<span class="str">'\s+'</span>, <span class="str">"hello    world   python"</span>, maxsplit=<span class="num">1</span>)
+<span class="cmt"># → ['hello', 'world   python']</span>
+
+<span class="cmt"># Split and keep delimiters</span>
+text = <span class="str">"hello123world456python"</span>
+parts = re.<span class="fn">split</span>(r<span class="str">'(\d+)'</span>, text)  <span class="cmt"># use () to keep delimiters</span>
+<span class="cmt"># → ['hello', '123', 'world', '456', 'python']</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="regex groups capturing group backreference match group">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">Groups & Capturing</span>
+      <span class="fn-desc">Extract parts of matched patterns</span>
+      <span class="complexity other">O(n)</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="cmt"># Capturing groups ()</span>
+pattern = r<span class="str">'(\w+)@(\w+)\.(\w+)'</span>  <span class="cmt">email pattern</span>
+match = re.<span class="fn">search</span>(pattern, <span class="str">"user@example.com"</span>)
+
+match.<span class="fn">group</span>()     <span class="cmt"># → "user@example.com"  (entire match)</span>
+match.<span class="fn">group</span>(<span class="num">1</span>)   <span class="cmt"># → "user"           (first group)</span>
+match.<span class="fn">group</span>(<span class="num">2</span>)   <span class="cmt"># → "example"        (second group)</span>
+match.<span class="fn">group</span>(<span class="num">3</span>)   <span class="cmt"># → "com"            (third group)</span>
+match.<span class="fn">groups</span>()   <span class="cmt"># → ("user", "example", "com")</span>
+
+<span class="cmt"># Named groups (?P&lt;name&gt;...)</span>
+pattern = r<span class="str">'(?P&lt;user&gt;\w+)@(?P&lt;domain&gt;\w+)\.(?P&lt;tld&gt;\w+)'</span>
+match = re.<span class="fn">search</span>(pattern, <span class="str">"user@example.com"</span>)
+match.<span class="fn">group</span>(<span class="str">'user'</span>)    <span class="cmt"># → "user"</span>
+match.<span class="fn">group</span>(<span class="str">'domain'</span>)  <span class="cmt"># → "example"</span>
+match.<span class="fn">groupdict</span>()      <span class="cmt"># → {'user': 'user', 'domain': 'example', 'tld': 'com'}</span>
+
+<span class="cmt"># Backreferences in replacement</span>
+text = <span class="str">"hello world"</span>
+result = re.<span class="fn">sub</span>(r<span class="str">'(\w+) (\w+)'</span>, r<span class="str">'\2 \1'</span>, text)
+<span class="cmt"># → "world hello"  (\1=first group, \2=second group)</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="re compile pattern object regex performance">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">compile() - Pattern Objects</span>
+      <span class="fn-desc">Pre-compile patterns for reuse</span>
+      <span class="complexity o1">O(1) per match (after compile)</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="cmt"># Compile pattern for reuse (faster than re.search each time)</span>
+pattern = re.<span class="fn">compile</span>(r<span class="str">'\d{3}-\d{3}-\d{4}'</span>)
+
+<span class="cmt"># Use compiled pattern</span>
+match = pattern.<span class="fn">search</span>(<span class="str">"Phone: 123-456-7890"</span>)
+match = pattern.<span class="fn">search</span>(<span class="str">"Call 999-888-7777"</span>)
+
+results = pattern.<span class="fn">findall</span>(<span class="str">"123-456-7890 and 999-888-7777"</span>)
+<span class="cmt"># → ['123-456-7890', '999-888-7777']</span>
+
+<span class="cmt"># Check if pattern exists</span>
+<span class="kw">if</span> pattern.<span class="fn">search</span>(text):
+    <span class="fn">print</span>(<span class="str">"Found phone number"</span>)
+
+<span class="cmt"># Pattern.match (from start) vs Pattern.search (anywhere)</span>
+pattern = re.<span class="fn">compile</span>(r<span class="str">'^\w+'</span>)
+pattern.<span class="fn">match</span>(<span class="str">"hello world"</span>)   <span class="cmt"># matches</span>
+pattern.<span class="fn">search</span>(<span class="str">"say hello"</span>)    <span class="cmt"># doesn't match (not at start)</span></pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="regex flags modifiers IGNORECASE MULTILINE DOTALL VERBOSE">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">Flags (Modifiers)</span>
+      <span class="fn-desc">Control regex behavior</span>
+      <span class="complexity other">Reference</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="cmt"># Flags control pattern matching behavior</span>
+
+<span class="cmt"># re.IGNORECASE (re.I) - case-insensitive matching</span>
+re.<span class="fn">search</span>(r<span class="str">'hello'</span>, <span class="str">"HELLO world"</span>, re.IGNORECASE)  <span class="cmt"># matches!</span>
+
+<span class="cmt"># re.MULTILINE (re.M) - ^ and $ match line boundaries</span>
+text = <span class="str">"hello\nworld"</span>
+re.<span class="fn">findall</span>(r<span class="str">'^[a-z]+'</span>, text, re.MULTILINE)
+<span class="cmt"># → ['hello', 'world']  (without MULTILINE: ['hello'] only)</span>
+
+<span class="cmt"># re.DOTALL (re.S) - . matches newline too</span>
+pattern = r<span class="str">'<.*>'</span>
+text = <span class="str">"<tag\nwith\nnewline>"</span>
+re.<span class="fn">search</span>(pattern, text, re.DOTALL)  <span class="cmt"># matches with newlines</span>
+
+<span class="cmt"># re.VERBOSE (re.X) - ignore whitespace, allow comments</span>
+pattern = re.<span class="fn">compile</span>(r<span class="str">"""
+    \d{3}     # area code
+    -         # separator
+    \d{3}     # exchange
+    -         # separator
+    \d{4}     # number
+"""</span>, re.VERBOSE)
+
+<span class="cmt"># Combine multiple flags</span>
+pattern = re.<span class="fn">compile</span>(r<span class="str">'^hello'</span>, re.IGNORECASE | re.MULTILINE)</pre>
+    </div>
+  </div>
+
+  <div class="method-card" data-search="regex common patterns email phone URLs IPv4 password">
+    <div class="card-head" onclick="toggle(this)">
+      <span class="chevron">▶</span>
+      <span class="fn-name">Common Patterns (Email, Phone, URL, etc.)</span>
+      <span class="fn-desc">Ready-to-use regex patterns</span>
+      <span class="complexity other">Reference</span>
+    </div>
+    <div class="card-body">
+      <pre><span class="cmt"># Email validation</span>
+email_pattern = r<span class="str">'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$'</span>
+re.<span class="fn">match</span>(email_pattern, <span class="str">"user@example.com"</span>, re.IGNORECASE)
+
+<span class="cmt"># Phone number (XXX-XXX-XXXX)</span>
+phone_pattern = r<span class="str">'\d{3}-\d{3}-\d{4}'</span>
+re.<span class="fn">findall</span>(phone_pattern, <span class="str">"Call 123-456-7890"</span>)
+
+<span class="cmt"># URL/HTTP</span>
+url_pattern = r<span class="str">'https?://[^\s]+'</span>
+re.<span class="fn">findall</span>(url_pattern, text)
+
+<span class="cmt"># IPv4 address</span>
+ipv4_pattern = r<span class="str">'\b(?:\d{1,3}\.){3}\d{1,3}\b'</span>
+re.<span class="fn">findall</span>(ipv4_pattern, <span class="str">"192.168.1.1 or 10.0.0.1"</span>)
+
+<span class="cmt"># Date formats (YYYY-MM-DD)</span>
+date_pattern = r<span class="str">'\d{4}-\d{2}-\d{2}'</span>
+re.<span class="fn">findall</span>(date_pattern, <span class="str">"Created on 2024-01-15"</span>)
+
+<span class="cmt"># Word boundaries (\b = word boundary)</span>
+pattern = r<span class="str">'\bpython\b'</span>  <span class="cmt">matches "python" as whole word, not in "pythonic"</span>
+
+<span class="cmt"># Lookahead / Lookbehind (Advanced)</span>
+positive_lookahead = r<span class="str">'foo(?=bar)'</span>     <span class="cmt">matches "foo" if followed by "bar"</span>
+negative_lookahead = r<span class="str">'foo(?!bar)'</span>     <span class="cmt">matches "foo" if NOT followed by "bar"</span>
+positive_lookbehind = r<span class="str">'(?<=foo)bar'</span>    <span class="cmt">matches "bar" if preceded by "foo"</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ────── 19. PERFORMANCE ────── -->
+<section class="section" id="performance">
+  <div class="section-header">
+    <span class="num">19</span>
     <h2>Time &amp; Performance</h2>
     <span class="badge">Profiling · Caching</span>
   </div>
@@ -1621,7 +2417,7 @@ fibonacci.cache_clear()  <span class="cmt"># clear cache</span>
 </section>
 
 <footer style="text-align:center;padding:32px 0 16px;color:var(--text-muted);font-size:.8rem;border-top:1px solid var(--surface2);margin-top:40px">
-  Python DSA Reference · Based on Python 3.9+ · <a href="https://docs.python.org/3/library/" style="color:var(--accent)">Official Docs ↗</a>
+  Python DSA Reference · 19 Sections (Regex included) · Python 3.9+ · <a href="https://docs.python.org/3/library/" style="color:var(--accent)">Official Docs ↗</a>
 </footer>
 
 </main>

@@ -1,5 +1,6 @@
 import random
 import time
+import ast
 def mergeSort(arr, l, r):
     if l >= r:
         return
@@ -29,12 +30,13 @@ def merge(arr,l,m,r):
         arr[i] = temp[i-l]
 
 
-arr = [random.randint(0, 16) for x in range(0, 16)]
-print(arr)
+# arr = [random.randint(0, 16) for x in range(0, 16)]
+arr = ast.literal_eval(open('tc.txt').read())
+# print(arr)
 curr = time.time()
 mergeSort(arr, 0, len(arr)-1)
 t = (time.time()-curr) * 1000
-print(arr)
+# print(arr)
 print(f"{t:.2f} ms")
 
 ''' 
