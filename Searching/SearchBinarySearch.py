@@ -1,28 +1,28 @@
 import random as r
 
-# # Recursive binary search implementation
-# def search(nums, target) -> int:
-#     # Inner recursive function that searches between left and right indices
-#     def binary_search(left, right):
-#         # Base case: if left pointer exceeds right pointer, target not found
-#         if left > right:
-#             return -1
+# Recursive binary search implementation
+def search(nums, target) -> int:
+    # Inner recursive function that searches between left and right indices
+    def binary_search(left, right):
+        # Base case: if left pointer exceeds right pointer, target not found
+        if left > right:
+            return -1
         
-#         # Calculate middle index to avoid overflow
-#         mid = (left + right) // 2
+        # Calculate middle index to avoid overflow
+        mid = (left + right) // 2
         
-#         # If middle element matches target, return its index
-#         if nums[mid] == target:
-#             return mid
-#         # If middle element is greater than target, search left half
-#         elif nums[mid] > target:
-#             return binary_search(left, mid - 1)
-#         # If middle element is less than target, search right half
-#         else:
-#             return binary_search(mid + 1, right)
+        # If middle element matches target, return its index
+        if nums[mid] == target:
+            return mid
+        # If middle element is greater than target, search left half
+        elif nums[mid] > target:
+            return binary_search(left, mid - 1)
+        # If middle element is less than target, search right half
+        else:
+            return binary_search(mid + 1, right)
     
-#     # Start recursive search from first to last index
-#     return binary_search(0, len(nums) - 1)
+    # Start recursive search from first to last index
+    return binary_search(0, len(nums) - 1)
 
 # Iterative binary search implementation
 def search_iterative(nums, target: int) -> int:

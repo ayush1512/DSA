@@ -1,6 +1,6 @@
 ''' 
 Consider a triangle with three sides measuring a, b, and c units. A triangle is a right-angled triangle if
-a 2 + b2 = c2
+a2 + b2 = c2
 
 Allow a tolerance of 0.000001 in the comparison in the above case i.e
 a2 + b2 = c2 +/- 0.000001
@@ -39,3 +39,16 @@ Input:
 Output:
 invalid
 '''
+
+ip = list(map(float,input().split()))
+ip.sort()
+if ip[0]+ip[1] <= ip[2]:
+    print('invalid')
+elif abs((ip[0]**2 + ip[1]**2) - ip[2]**2) <= 0.000001:
+    print('right-angled')
+elif ip[0] == ip[1] == ip[2]:
+    print('equilateral')
+elif ip[0] == ip[1] or ip[0] == ip[2] or ip[1] == ip[2]:
+    print('isosceles')
+else:
+    print('notspecial')

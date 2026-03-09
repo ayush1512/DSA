@@ -1,30 +1,30 @@
-no = int(input())
-teams = []
-for i in range(no):
-    teams.append(str(input()))
-mat = int(input())
-res = {}
-wcnt = {}
-for i in range(mat):
-   ip = list(input().split())
-   if ip[1] > ip [3]:
-       wcnt[ip[0]] = wcnt.get(ip[0],0)+2
-   elif ip[1] == ip[3]:
-       wcnt[ip[0]] = wcnt.get(ip[0],0)+1
-       wcnt[ip[2]] = wcnt.get(ip[2],0)+1
-   else:
-        wcnt[ip[2]] = wcnt.get(ip[2],0)+2
-   for i in range(0,len(ip),2):
-       res[ip[i]] = res.get(ip[i],0)+float(ip[i+1])
+# no = int(input())
+# teams = []
+# for i in range(no):
+#     teams.append(str(input()))
+# mat = int(input())
+# res = {}
+# wcnt = {}
+# for i in range(mat):
+#    ip = list(input().split())
+#    if ip[1] > ip [3]:
+#        wcnt[ip[0]] = wcnt.get(ip[0],0)+2
+#    elif ip[1] == ip[3]:
+#        wcnt[ip[0]] = wcnt.get(ip[0],0)+1
+#        wcnt[ip[2]] = wcnt.get(ip[2],0)+1
+#    else:
+#         wcnt[ip[2]] = wcnt.get(ip[2],0)+2
+#    for i in range(0,len(ip),2):
+#        res[ip[i]] = res.get(ip[i],0)+float(ip[i+1])
 
-fres = []
-for i in range(no):
-    fres.append((teams[i],wcnt[teams[i]],res[teams[i]]))
+# fres = []
+# for i in range(no):
+#     fres.append((teams[i],wcnt[teams[i]],res[teams[i]]))
     
 
-s_fres = sorted(fres,key = lambda x: (x[1],x[2]),reverse=True)
-for i in range(no):
-    print(' '.join(map(str,s_fres[i])),end='\n')
+# s_fres = sorted(fres,key = lambda x: (x[1],x[2]),reverse=True)
+# for i in range(no):
+#     print(' '.join(map(str,s_fres[i])),end='\n')
     
 '''
 Currently the fifth edition of Indian Premier League (IPL-5) is going on and the overall point table is changing after every match. The point table is based on the match result (win/loss) and the net run rate of each team.
@@ -62,3 +62,36 @@ A 2 4.20
 D 2 3.50
 C 2 3.30
 '''
+
+n = int(input().strip())
+teams = [input().strip() for _ in range(n)]
+
+m = int(input().strip())
+
+# Initialize all teams to avoid missing-key errors
+points = {team: 0 for team in teams}
+net_rr = {team: 0.0 for team in teams}
+
+for _ in range(m):
+    t1, r1, t2, r2 = input().split()
+    r1 = float(r1)
+    r2 = float(r2)
+
+    # Sum net run rates
+    net_rr[t1] += r1
+    net_rr[t2] += r2
+
+    # Award points
+    if r1 > r2:
+        points[t1] += 2
+    elif r1 < r2:
+        points[t2] += 2
+    else:
+        points[t1] += 1
+        points[t2] += 1
+
+# Sort by points desc, then net run rate desc
+table = sorted(teams, key=lambda t: (points[t], net_rr[t]), reverse=True)
+
+for team in table:
+    print("{} {} {:.2f}".format(team, points[team], net_rr[team]))

@@ -220,7 +220,7 @@ while True:
         new.next = None
     elif ip[0] == 'AMA':
         data = ip[1]
-        new = Node(data)
+        new = Node(datbba)
         temp = head
         target = int(ip[2])
         while temp.next is not None and temp.val != target:
@@ -349,6 +349,37 @@ while True:
 #                 return
 #             temp = temp.next
 
+    # def delete_before(head, target):
+    #     """Delete node immediately before first occurrence of target. Return new head."""
+    #     if head is None or str(head.val) == str(target):
+    #         return head
+    #     pp = None            # previous-previous
+    #     p = head             # previous
+    #     t = head.next        # current (candidate target)
+    #     while t is not None and str(t.val) != str(target):
+    #         pp, p, t = p, t, t.next
+        #     if t is None:
+        #         return head      # target not found
+        #   # delete p
+        #     if pp is None:
+        #         # p is head
+        #         head = head.next
+        #     else:
+        #         pp.next = t
+        #     return head
+
+    # def reverse_print(head):
+    #     """Print list values in reverse order separated by space and terminated by newline."""
+    #     vals = []
+    #     t = head
+    #     while t:
+    #         vals.append(str(t.val))
+    #         t = t.next
+    #     if vals:
+    #         print(" ".join(reversed(vals)))
+    #     else:
+    #         print()
+
 #     def print_list(self):
 #         temp = self.head
 #         while temp is not None:
@@ -364,7 +395,6 @@ while True:
 # # Initialize with sample data if needed
 # ll.add_beginning(30)
 # ll.add_beginning(20)
-# ll.add_beginning(10)
 
 # print("Commands: AB <val>, AMA <val> <target>, AMB <val> <target>, DN <target>, DNA <target>, FPR, EXIT")
 
