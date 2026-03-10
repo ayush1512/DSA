@@ -1,0 +1,1996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Commands - Interactive Learning Guide</title>
+    <style>
+        /* ── Reset & Globals ─────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0d1117; --surface: #161b22; --border: #30363d;
+            --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+            --green: #3fb950; --red: #f85149; --orange: #d29922;
+            --purple: #bc8cff; --pink: #f778ba; --cyan: #39d2c0;
+            --commit: #58a6ff; --branch: #3fb950; --head: #f85149;
+            --stash: #d29922; --remote: #bc8cff; --tag: #f778ba;
+            --sidebar-w: 280px; --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: var(--font); background: var(--bg); color: var(--text);
+            display: flex; min-height: 100vh; overflow-x: hidden;
+        }
+
+        /* ── Sidebar ─────────────────────────────────────── */
+        .sidebar {
+            width: var(--sidebar-w); min-width: var(--sidebar-w); background: var(--surface);
+            border-right: 1px solid var(--border); padding: 24px 0; position: fixed;
+            top: 0; left: 0; height: 100vh; overflow-y: auto; z-index: 100;
+            transition: transform .3s ease;
+        }
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        .sidebar-header { padding: 0 20px 20px; border-bottom: 1px solid var(--border); }
+        .sidebar-header h1 {
+            font-size: 22px; font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .sidebar-header p { font-size: 12px; color: var(--muted); margin-top: 4px; }
+        .nav-group { padding: 16px 0 0; }
+        .nav-group-title {
+            font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px;
+            color: var(--muted); padding: 0 20px 8px; font-weight: 600;
+        }
+        .nav-link {
+            display: flex; align-items: center; gap: 10px; padding: 8px 20px;
+            font-size: 14px; color: var(--text); text-decoration: none;
+            transition: all .15s; cursor: pointer; border-left: 3px solid transparent;
+        }
+        .nav-link:hover { background: rgba(88,166,255,.08); color: var(--accent); }
+        .nav-link.active {
+            background: rgba(88,166,255,.12); color: var(--accent);
+            border-left-color: var(--accent);
+        }
+        .nav-link .icon { font-size: 16px; width: 22px; text-align: center; }
+        .nav-link code {
+            font-family: var(--mono); font-size: 12px;
+            background: rgba(88,166,255,.1); padding: 2px 6px; border-radius: 4px;
+        }
+
+        /* ── Main Content ────────────────────────────────── */
+        .main { margin-left: var(--sidebar-w); flex: 1; padding: 40px 48px 80px; max-width: 960px; }
+
+        /* Hero */
+        .hero {
+            text-align: center; padding: 60px 0 48px;
+            border-bottom: 1px solid var(--border); margin-bottom: 48px;
+        }
+        .hero h1 {
+            font-size: 42px; font-weight: 800; line-height: 1.2;
+            background: linear-gradient(135deg, var(--accent), var(--purple), var(--pink));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero p { font-size: 18px; color: var(--muted); margin-top: 12px; max-width: 540px; margin-inline: auto; }
+
+        /* Section */
+        .cmd-section {
+            margin-bottom: 56px; padding-top: 24px;
+            border-top: 1px solid var(--border); scroll-margin-top: 24px;
+        }
+        .cmd-section:first-of-type { border-top: none; }
+        .cmd-title {
+            font-size: 26px; font-weight: 700; margin-bottom: 6px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .cmd-title .badge {
+            font-size: 11px; padding: 3px 10px; border-radius: 12px;
+            font-weight: 600; text-transform: uppercase; letter-spacing: .5px;
+        }
+        .badge-basic { background: rgba(63,185,80,.15); color: var(--green); }
+        .badge-branch { background: rgba(188,140,255,.15); color: var(--purple); }
+        .badge-remote { background: rgba(88,166,255,.15); color: var(--accent); }
+        .badge-undo { background: rgba(248,81,73,.15); color: var(--red); }
+        .badge-advanced { background: rgba(210,153,34,.15); color: var(--orange); }
+        .cmd-subtitle { color: var(--muted); font-size: 15px; margin-bottom: 20px; }
+
+        /* Syntax block */
+        .syntax-box {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 16px 20px; margin-bottom: 20px;
+            font-family: var(--mono); font-size: 14px; position: relative;
+        }
+        .syntax-box .label {
+            position: absolute; top: -10px; left: 12px; background: var(--surface);
+            padding: 0 8px; font-size: 11px; color: var(--muted); text-transform: uppercase;
+            letter-spacing: .8px;
+        }
+        .syntax-box code { color: var(--green); }
+        .syntax-box .flag { color: var(--orange); }
+        .syntax-box .placeholder { color: var(--muted); font-style: italic; }
+
+        /* Description */
+        .cmd-desc { line-height: 1.7; font-size: 15px; color: var(--text); margin-bottom: 20px; }
+        .cmd-desc strong { color: var(--accent); }
+        .cmd-desc ul { padding-left: 20px; margin-top: 8px; }
+        .cmd-desc li { margin-bottom: 6px; }
+
+        /* Flags table */
+        .flags-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 14px; }
+        .flags-table th {
+            text-align: left; padding: 10px 14px; background: var(--surface);
+            border: 1px solid var(--border); color: var(--muted); font-size: 12px;
+            text-transform: uppercase; letter-spacing: .5px;
+        }
+        .flags-table td { padding: 10px 14px; border: 1px solid var(--border); }
+        .flags-table td:first-child {
+            font-family: var(--mono); color: var(--orange); white-space: nowrap; font-size: 13px;
+        }
+
+        /* ── Animation Canvas ────────────────────────────── */
+        .anim-container {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; overflow: hidden; margin: 24px 0;
+        }
+        .anim-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 20px; border-bottom: 1px solid var(--border);
+        }
+        .anim-header span { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+        .anim-controls { display: flex; gap: 8px; }
+        .anim-btn {
+            background: rgba(88,166,255,.12); border: 1px solid rgba(88,166,255,.3);
+            color: var(--accent); padding: 5px 14px; border-radius: 6px;
+            font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s;
+            font-family: var(--font);
+        }
+        .anim-btn:hover { background: rgba(88,166,255,.2); }
+        .anim-btn.playing { background: rgba(248,81,73,.12); border-color: rgba(248,81,73,.3); color: var(--red); }
+        canvas.git-canvas {
+            width: 100%; display: block; background: transparent;
+        }
+        .anim-legend {
+            display: flex; flex-wrap: wrap; gap: 16px; padding: 10px 20px;
+            border-top: 1px solid var(--border); font-size: 12px;
+        }
+        .legend-item { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+        .legend-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+        }
+
+        /* Step indicator */
+        .step-indicator {
+            padding: 12px 20px; border-top: 1px solid var(--border);
+            font-size: 13px; color: var(--muted); text-align: center;
+            min-height: 42px; display: flex; align-items: center; justify-content: center;
+        }
+        .step-indicator .highlight { color: var(--accent); font-weight: 600; }
+
+        /* Tips */
+        .tip-box {
+            background: rgba(88,166,255,.06); border: 1px solid rgba(88,166,255,.2);
+            border-radius: 8px; padding: 14px 18px; margin: 16px 0; font-size: 14px;
+        }
+        .tip-box .tip-label { color: var(--accent); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+        .warning-box {
+            background: rgba(248,81,73,.06); border: 1px solid rgba(248,81,73,.2);
+            border-radius: 8px; padding: 14px 18px; margin: 16px 0; font-size: 14px;
+        }
+        .warning-box .tip-label { color: var(--red); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+
+        /* Category header */
+        .category-header {
+            font-size: 32px; font-weight: 800; margin: 48px 0 8px;
+            padding-top: 32px; border-top: 2px solid var(--border);
+            scroll-margin-top: 24px;
+        }
+        .category-header:first-of-type { border-top: none; margin-top: 0; }
+        .category-sub { color: var(--muted); font-size: 15px; margin-bottom: 32px; }
+
+        /* Mobile hamburger */
+        .hamburger {
+            display: none; position: fixed; top: 16px; left: 16px; z-index: 200;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+            padding: 8px 12px; cursor: pointer; color: var(--text); font-size: 20px;
+        }
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 99; }
+        @media (max-width: 800px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .hamburger { display: block; }
+            .overlay.open { display: block; }
+            .main { margin-left: 0; padding: 40px 20px 60px; }
+        }
+    </style>
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h1>🌳 Git Guide</h1>
+        <p>Interactive Learning with Animations</p>
+    </div>
+
+    <div class="nav-group">
+        <div class="nav-group-title">🟢 Setup & Basics</div>
+        <a class="nav-link" href="#git-init"><span class="icon">⚡</span><code>git init</code></a>
+        <a class="nav-link" href="#git-clone"><span class="icon">📦</span><code>git clone</code></a>
+        <a class="nav-link" href="#git-config"><span class="icon">⚙️</span><code>git config</code></a>
+    </div>
+    <div class="nav-group">
+        <div class="nav-group-title">📸 Snapshotting</div>
+        <a class="nav-link" href="#git-add"><span class="icon">➕</span><code>git add</code></a>
+        <a class="nav-link" href="#git-commit"><span class="icon">💾</span><code>git commit</code></a>
+        <a class="nav-link" href="#git-status"><span class="icon">📋</span><code>git status</code></a>
+        <a class="nav-link" href="#git-diff"><span class="icon">🔍</span><code>git diff</code></a>
+        <a class="nav-link" href="#git-stash"><span class="icon">📦</span><code>git stash</code></a>
+        <a class="nav-link" href="#git-log"><span class="icon">📜</span><code>git log</code></a>
+    </div>
+    <div class="nav-group">
+        <div class="nav-group-title">🌿 Branching & Merging</div>
+        <a class="nav-link" href="#git-branch"><span class="icon">🌿</span><code>git branch</code></a>
+        <a class="nav-link" href="#git-checkout"><span class="icon">🔀</span><code>git checkout</code></a>
+        <a class="nav-link" href="#git-switch"><span class="icon">↗️</span><code>git switch</code></a>
+        <a class="nav-link" href="#git-merge"><span class="icon">🔗</span><code>git merge</code></a>
+        <a class="nav-link" href="#git-rebase"><span class="icon">📐</span><code>git rebase</code></a>
+        <a class="nav-link" href="#git-cherry-pick"><span class="icon">🍒</span><code>git cherry-pick</code></a>
+    </div>
+    <div class="nav-group">
+        <div class="nav-group-title">🌐 Remote Operations</div>
+        <a class="nav-link" href="#git-remote"><span class="icon">🔌</span><code>git remote</code></a>
+        <a class="nav-link" href="#git-fetch"><span class="icon">📡</span><code>git fetch</code></a>
+        <a class="nav-link" href="#git-pull"><span class="icon">⬇️</span><code>git pull</code></a>
+        <a class="nav-link" href="#git-push"><span class="icon">⬆️</span><code>git push</code></a>
+    </div>
+    <div class="nav-group">
+        <div class="nav-group-title">⏪ Undo & History</div>
+        <a class="nav-link" href="#git-reset"><span class="icon">⏮</span><code>git reset</code></a>
+        <a class="nav-link" href="#git-revert"><span class="icon">↩️</span><code>git revert</code></a>
+        <a class="nav-link" href="#git-restore"><span class="icon">🔄</span><code>git restore</code></a>
+        <a class="nav-link" href="#git-tag"><span class="icon">🏷️</span><code>git tag</code></a>
+    </div>
+</nav>
+
+<!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+<main class="main">
+
+<div class="hero">
+    <h1>Git Commands<br>Interactive Guide</h1>
+    <p>Learn every major Git command with animated tree visualizations showing exactly what happens under the hood.</p>
+</div>
+
+<!-- ─────────────── SETUP & BASICS ─────────────── -->
+<h2 class="category-header" style="color:var(--green)">🟢 Setup & Basics</h2>
+<p class="category-sub">Initialize repositories, clone projects, and configure your Git environment.</p>
+
+<!-- GIT INIT -->
+<section class="cmd-section" id="git-init">
+    <h3 class="cmd-title">git init <span class="badge badge-basic">Basic</span></h3>
+    <p class="cmd-subtitle">Initialize a new Git repository in the current directory</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git init</code> <span class="placeholder">[directory]</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Creates a new <strong>.git</strong> subdirectory containing all necessary repository metadata. This is the first command you run in a new project. It does not affect existing files.</p>
+        <ul>
+            <li>Creates the <strong>.git/</strong> folder with objects, refs, HEAD, and config</li>
+            <li>Sets the default branch (usually <strong>main</strong> or <strong>master</strong>)</li>
+            <li>No commits are created – you start with a clean slate</li>
+        </ul>
+    </div>
+    <div class="anim-container">
+        <div class="anim-header">
+            <span>🎬 Animation: git init</span>
+            <div class="anim-controls">
+                <button class="anim-btn" onclick="playAnimation('init')">▶ Play</button>
+                <button class="anim-btn" onclick="resetAnimation('init')">↺ Reset</button>
+            </div>
+        </div>
+        <canvas class="git-canvas" id="canvas-init" width="860" height="220"></canvas>
+        <div class="step-indicator" id="step-init">Click Play to see how <span class="highlight">git init</span> sets up a repository</div>
+    </div>
+    <div class="tip-box">
+        <div class="tip-label">💡 Tip</div>
+        Use <code>git init --bare</code> to create a bare repository (no working directory) – typically used for remote/server repos.
+    </div>
+</section>
+
+<!-- GIT CLONE -->
+<section class="cmd-section" id="git-clone">
+    <h3 class="cmd-title">git clone <span class="badge badge-basic">Basic</span></h3>
+    <p class="cmd-subtitle">Clone a repository into a new directory</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git clone</code> <span class="placeholder">&lt;url&gt;</span> <span class="placeholder">[directory]</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Creates a copy of an existing repository. It automatically sets up a <strong>remote</strong> called <code>origin</code> pointing to the cloned URL, downloads all branches and history, and checks out the default branch.</p>
+    </div>
+    <table class="flags-table">
+        <tr><th>Flag</th><th>Description</th></tr>
+        <tr><td>--depth &lt;n&gt;</td><td>Create a shallow clone with only the last <em>n</em> commits</td></tr>
+        <tr><td>--branch &lt;name&gt;</td><td>Clone a specific branch instead of the default</td></tr>
+        <tr><td>--single-branch</td><td>Clone only the history of a single branch</td></tr>
+        <tr><td>--recurse-submodules</td><td>Initialize and clone submodules as well</td></tr>
+    </table>
+    <div class="anim-container">
+        <div class="anim-header">
+            <span>🎬 Animation: git clone</span>
+            <div class="anim-controls">
+                <button class="anim-btn" onclick="playAnimation('clone')">▶ Play</button>
+                <button class="anim-btn" onclick="resetAnimation('clone')">↺ Reset</button>
+            </div>
+        </div>
+        <canvas class="git-canvas" id="canvas-clone" width="860" height="260"></canvas>
+        <div class="step-indicator" id="step-clone">Click Play to see how <span class="highlight">git clone</span> copies a repository</div>
+    </div>
+</section>
+
+<!-- GIT CONFIG -->
+<section class="cmd-section" id="git-config">
+    <h3 class="cmd-title">git config <span class="badge badge-basic">Basic</span></h3>
+    <p class="cmd-subtitle">Get and set repository or global options</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git config</code> <span class="flag">[--global | --local | --system]</span> <span class="placeholder">&lt;key&gt; &lt;value&gt;</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Configure Git settings at different levels. The most common use is setting your <strong>user name</strong> and <strong>email</strong>.</p>
+    </div>
+    <table class="flags-table">
+        <tr><th>Level</th><th>Scope</th><th>File Location</th></tr>
+        <tr><td>--system</td><td>All users on the machine</td><td>/etc/gitconfig</td></tr>
+        <tr><td>--global</td><td>Current user, all repos</td><td>~/.gitconfig</td></tr>
+        <tr><td>--local</td><td>Current repository only</td><td>.git/config</td></tr>
+    </table>
+    <div class="syntax-box">
+        <span class="label">Examples</span>
+        <code>git config --global user.name "Your Name"</code><br>
+        <code>git config --global user.email "you@example.com"</code><br>
+        <code>git config --list</code>
+    </div>
+</section>
+
+<!-- ─────────────── SNAPSHOTTING ─────────────── -->
+<h2 class="category-header" style="color:var(--accent)">📸 Snapshotting</h2>
+<p class="category-sub">Stage changes, create commits, inspect differences, and view history.</p>
+
+<!-- GIT ADD -->
+<section class="cmd-section" id="git-add">
+    <h3 class="cmd-title">git add <span class="badge badge-basic">Basic</span></h3>
+    <p class="cmd-subtitle">Add file contents to the staging area (index)</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git add</code> <span class="placeholder">&lt;pathspec&gt;...</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Moves changes from the <strong>Working Directory</strong> to the <strong>Staging Area</strong> (also called the Index). This is the step before committing — it lets you prepare exactly which changes go into the next commit.</p>
+    </div>
+    <table class="flags-table">
+        <tr><th>Flag</th><th>Description</th></tr>
+        <tr><td>git add .</td><td>Stage all changes in current directory and below</td></tr>
+        <tr><td>git add -A</td><td>Stage all changes in the entire working tree</td></tr>
+        <tr><td>git add -p</td><td>Interactively select hunks to stage</td></tr>
+        <tr><td>git add *.js</td><td>Stage all .js files</td></tr>
+    </table>
+    <div class="anim-container">
+        <div class="anim-header">
+            <span>🎬 Animation: git add</span>
+            <div class="anim-controls">
+                <button class="anim-btn" onclick="playAnimation('add')">▶ Play</button>
+                <button class="anim-btn" onclick="resetAnimation('add')">↺ Reset</button>
+            </div>
+        </div>
+        <canvas class="git-canvas" id="canvas-add" width="860" height="240"></canvas>
+        <div class="step-indicator" id="step-add">Click Play to see files move from <span class="highlight">Working Dir → Staging Area</span></div>
+    </div>
+</section>
+
+<!-- GIT COMMIT -->
+<section class="cmd-section" id="git-commit">
+    <h3 class="cmd-title">git commit <span class="badge badge-basic">Basic</span></h3>
+    <p class="cmd-subtitle">Record changes to the repository</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git commit</code> <span class="flag">-m</span> <span class="placeholder">"message"</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Takes the staged snapshot and permanently stores it in the repository history. Each commit has a <strong>unique SHA-1 hash</strong>, author information, timestamp, and a pointer to its parent commit(s).</p>
+    </div>
+    <table class="flags-table">
+        <tr><th>Flag</th><th>Description</th></tr>
+        <tr><td>-m "msg"</td><td>Commit with an inline message</td></tr>
+        <tr><td>-a</td><td>Automatically stage all tracked modified files before committing</td></tr>
+        <tr><td>--amend</td><td>Replace the last commit with a new one (edit message or add changes)</td></tr>
+        <tr><td>--no-edit</td><td>Amend without changing the commit message</td></tr>
+    </table>
+    <div class="anim-container">
+        <div class="anim-header">
+            <span>🎬 Animation: git commit</span>
+            <div class="anim-controls">
+                <button class="anim-btn" onclick="playAnimation('commit')">▶ Play</button>
+                <button class="anim-btn" onclick="resetAnimation('commit')">↺ Reset</button>
+            </div>
+        </div>
+        <canvas class="git-canvas" id="canvas-commit" width="860" height="280"></canvas>
+        <div class="step-indicator" id="step-commit">Click Play to see a new commit added to the <span class="highlight">tree</span></div>
+    </div>
+</section>
+
+<!-- GIT STATUS -->
+<section class="cmd-section" id="git-status">
+    <h3 class="cmd-title">git status <span class="badge badge-basic">Basic</span></h3>
+    <p class="cmd-subtitle">Show the working tree status</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git status</code> <span class="flag">[-s | --short]</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Displays the state of the working directory and staging area. It shows which files are <strong>staged</strong>, <strong>unstaged</strong>, and <strong>untracked</strong>.</p>
+        <ul>
+            <li><strong style="color:var(--green)">Green</strong> = staged (ready to commit)</li>
+            <li><strong style="color:var(--red)">Red</strong> = modified but not staged</li>
+            <li>Untracked files are listed separately</li>
+        </ul>
+    </div>
+    <div class="tip-box">
+        <div class="tip-label">💡 Tip</div>
+        Use <code>git status -s</code> for a compact two-column output. First column = staging area, second = working tree.
+    </div>
+</section>
+
+<!-- GIT DIFF -->
+<section class="cmd-section" id="git-diff">
+    <h3 class="cmd-title">git diff <span class="badge badge-basic">Basic</span></h3>
+    <p class="cmd-subtitle">Show changes between commits, branches, or working tree</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git diff</code> <span class="flag">[--staged]</span> <span class="placeholder">[&lt;commit&gt;] [-- &lt;path&gt;]</span>
+    </div>
+    <div class="cmd-desc">
+        <ul>
+            <li><code>git diff</code> — changes in working dir vs staging area</li>
+            <li><code>git diff --staged</code> — changes in staging area vs last commit</li>
+            <li><code>git diff branch1..branch2</code> — differences between two branches</li>
+            <li><code>git diff HEAD~3..HEAD</code> — changes in the last 3 commits</li>
+        </ul>
+    </div>
+</section>
+
+<!-- GIT STASH -->
+<section class="cmd-section" id="git-stash">
+    <h3 class="cmd-title">git stash <span class="badge badge-advanced">Advanced</span></h3>
+    <p class="cmd-subtitle">Temporarily shelve changes for later use</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git stash</code> <span class="flag">[push | pop | list | drop | apply]</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Saves your uncommitted changes (both staged and unstaged) to a <strong>stash stack</strong> and reverts the working directory to HEAD. Useful when you need to switch branches but aren't ready to commit.</p>
+    </div>
+    <table class="flags-table">
+        <tr><th>Command</th><th>Description</th></tr>
+        <tr><td>git stash</td><td>Stash current changes</td></tr>
+        <tr><td>git stash pop</td><td>Apply most recent stash and remove it from stack</td></tr>
+        <tr><td>git stash apply</td><td>Apply most recent stash but keep it in stack</td></tr>
+        <tr><td>git stash list</td><td>List all stashed entries</td></tr>
+        <tr><td>git stash drop</td><td>Remove the most recent stash</td></tr>
+        <tr><td>git stash -u</td><td>Include untracked files in the stash</td></tr>
+    </table>
+    <div class="anim-container">
+        <div class="anim-header">
+            <span>🎬 Animation: git stash / pop</span>
+            <div class="anim-controls">
+                <button class="anim-btn" onclick="playAnimation('stash')">▶ Play</button>
+                <button class="anim-btn" onclick="resetAnimation('stash')">↺ Reset</button>
+            </div>
+        </div>
+        <canvas class="git-canvas" id="canvas-stash" width="860" height="260"></canvas>
+        <div class="step-indicator" id="step-stash">Click Play to see changes get <span class="highlight">stashed</span> and <span class="highlight">popped</span></div>
+    </div>
+</section>
+
+<!-- GIT LOG -->
+<section class="cmd-section" id="git-log">
+    <h3 class="cmd-title">git log <span class="badge badge-basic">Basic</span></h3>
+    <p class="cmd-subtitle">Show commit history</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git log</code> <span class="flag">[--oneline] [--graph] [--all]</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Displays the commit history starting from the current HEAD. Combine flags for different views:</p>
+        <ul>
+            <li><code>git log --oneline</code> — one commit per line</li>
+            <li><code>git log --graph --oneline --all</code> — ASCII art tree of all branches</li>
+            <li><code>git log --author="name"</code> — filter by author</li>
+            <li><code>git log -n 5</code> — show only last 5 commits</li>
+            <li><code>git log --since="2024-01-01"</code> — commits after a date</li>
+        </ul>
+    </div>
+    <div class="anim-container">
+        <div class="anim-header">
+            <span>🎬 Animation: git log --graph</span>
+            <div class="anim-controls">
+                <button class="anim-btn" onclick="playAnimation('log')">▶ Play</button>
+                <button class="anim-btn" onclick="resetAnimation('log')">↺ Reset</button>
+            </div>
+        </div>
+        <canvas class="git-canvas" id="canvas-log" width="860" height="300"></canvas>
+        <div class="step-indicator" id="step-log">Click Play to see the <span class="highlight">commit graph</span> build up</div>
+    </div>
+</section>
+
+<!-- ─────────────── BRANCHING & MERGING ─────────────── -->
+<h2 class="category-header" style="color:var(--purple)">🌿 Branching & Merging</h2>
+<p class="category-sub">Create branches, switch contexts, merge changes, and rewrite history.</p>
+
+<!-- GIT BRANCH -->
+<section class="cmd-section" id="git-branch">
+    <h3 class="cmd-title">git branch <span class="badge badge-branch">Branch</span></h3>
+    <p class="cmd-subtitle">List, create, or delete branches</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git branch</code> <span class="placeholder">[name]</span> <span class="flag">[-d | -D] [-a] [-r]</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Branches are lightweight pointers to commits. Creating a branch is almost instant — it just creates a new pointer.</p>
+    </div>
+    <table class="flags-table">
+        <tr><th>Command</th><th>Description</th></tr>
+        <tr><td>git branch</td><td>List local branches (* marks current)</td></tr>
+        <tr><td>git branch &lt;name&gt;</td><td>Create a new branch at current HEAD</td></tr>
+        <tr><td>git branch -d &lt;name&gt;</td><td>Delete branch (safe – only if merged)</td></tr>
+        <tr><td>git branch -D &lt;name&gt;</td><td>Force delete branch</td></tr>
+        <tr><td>git branch -a</td><td>List all branches (local + remote)</td></tr>
+        <tr><td>git branch -m &lt;old&gt; &lt;new&gt;</td><td>Rename a branch</td></tr>
+    </table>
+    <div class="anim-container">
+        <div class="anim-header">
+            <span>🎬 Animation: git branch</span>
+            <div class="anim-controls">
+                <button class="anim-btn" onclick="playAnimation('branch')">▶ Play</button>
+                <button class="anim-btn" onclick="resetAnimation('branch')">↺ Reset</button>
+            </div>
+        </div>
+        <canvas class="git-canvas" id="canvas-branch" width="860" height="300"></canvas>
+        <div class="step-indicator" id="step-branch">Click Play to see a new <span class="highlight">branch</span> being created</div>
+    </div>
+</section>
+
+<!-- GIT CHECKOUT -->
+<section class="cmd-section" id="git-checkout">
+    <h3 class="cmd-title">git checkout <span class="badge badge-branch">Branch</span></h3>
+    <p class="cmd-subtitle">Switch branches or restore working tree files</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git checkout</code> <span class="placeholder">&lt;branch&gt;</span><br>
+        <code>git checkout</code> <span class="flag">-b</span> <span class="placeholder">&lt;new-branch&gt;</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Switches HEAD to a different branch and updates the working directory. With <code>-b</code>, it creates a new branch and switches to it in one command.</p>
+        <ul>
+            <li><code>git checkout main</code> — switch to main branch</li>
+            <li><code>git checkout -b feature</code> — create & switch to "feature" branch</li>
+            <li><code>git checkout -- file.txt</code> — discard changes to a file (legacy; use <code>git restore</code>)</li>
+        </ul>
+    </div>
+    <div class="tip-box">
+        <div class="tip-label">💡 Modern Alternative</div>
+        Since Git 2.23, prefer <code>git switch</code> for branch switching and <code>git restore</code> for file restoring. <code>checkout</code> was overloaded with too many responsibilities.
+    </div>
+</section>
+
+<!-- GIT SWITCH -->
+<section class="cmd-section" id="git-switch">
+    <h3 class="cmd-title">git switch <span class="badge badge-branch">Branch</span></h3>
+    <p class="cmd-subtitle">Switch branches (modern replacement for checkout)</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git switch</code> <span class="placeholder">&lt;branch&gt;</span><br>
+        <code>git switch</code> <span class="flag">-c</span> <span class="placeholder">&lt;new-branch&gt;</span>
+    </div>
+    <div class="cmd-desc">
+        <p>A focused command that only switches branches (introduced in Git 2.23). Clearer intent than <code>git checkout</code>.</p>
+        <ul>
+            <li><code>git switch main</code> — switch to main</li>
+            <li><code>git switch -c feature</code> — create & switch</li>
+            <li><code>git switch -</code> — switch to previous branch</li>
+        </ul>
+    </div>
+</section>
+
+<!-- GIT MERGE -->
+<section class="cmd-section" id="git-merge">
+    <h3 class="cmd-title">git merge <span class="badge badge-branch">Branch</span></h3>
+    <p class="cmd-subtitle">Combine branch histories together</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git merge</code> <span class="placeholder">&lt;branch&gt;</span> <span class="flag">[--no-ff] [--squash]</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Integrates changes from one branch into the current branch. There are two main types:</p>
+        <ul>
+            <li><strong>Fast-forward merge</strong> — if the current branch hasn't diverged, Git just moves the pointer forward. No merge commit created.</li>
+            <li><strong>Three-way merge</strong> — if branches have diverged, Git creates a new <strong>merge commit</strong> with two parents.</li>
+        </ul>
+    </div>
+    <table class="flags-table">
+        <tr><th>Flag</th><th>Description</th></tr>
+        <tr><td>--no-ff</td><td>Force a merge commit even if fast-forward is possible</td></tr>
+        <tr><td>--squash</td><td>Combine all changes into one commit (no merge commit)</td></tr>
+        <tr><td>--abort</td><td>Abort a merge in progress (during conflicts)</td></tr>
+    </table>
+    <div class="anim-container">
+        <div class="anim-header">
+            <span>🎬 Animation: git merge (3-way)</span>
+            <div class="anim-controls">
+                <button class="anim-btn" onclick="playAnimation('merge')">▶ Play</button>
+                <button class="anim-btn" onclick="resetAnimation('merge')">↺ Reset</button>
+            </div>
+        </div>
+        <canvas class="git-canvas" id="canvas-merge" width="860" height="340"></canvas>
+        <div class="step-indicator" id="step-merge">Click Play to see two branches <span class="highlight">merge</span> together</div>
+    </div>
+    <div class="warning-box">
+        <div class="tip-label">⚠️ Merge Conflicts</div>
+        If the same lines were changed in both branches, Git will pause and mark conflicts. Edit the files, then <code>git add</code> and <code>git commit</code> to complete the merge.
+    </div>
+</section>
+
+<!-- GIT REBASE -->
+<section class="cmd-section" id="git-rebase">
+    <h3 class="cmd-title">git rebase <span class="badge badge-advanced">Advanced</span></h3>
+    <p class="cmd-subtitle">Reapply commits on top of another base</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git rebase</code> <span class="placeholder">&lt;base-branch&gt;</span><br>
+        <code>git rebase</code> <span class="flag">-i</span> <span class="placeholder">&lt;commit&gt;</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Takes the commits from your current branch and <strong>replays them</strong> on top of the target branch, creating a <strong>linear history</strong> without merge commits.</p>
+        <ul>
+            <li><strong>Standard rebase</strong> — moves your branch to start from the tip of the base branch</li>
+            <li><strong>Interactive rebase</strong> (<code>-i</code>) — lets you squash, reword, reorder, or drop commits</li>
+        </ul>
+    </div>
+    <div class="anim-container">
+        <div class="anim-header">
+            <span>🎬 Animation: git rebase</span>
+            <div class="anim-controls">
+                <button class="anim-btn" onclick="playAnimation('rebase')">▶ Play</button>
+                <button class="anim-btn" onclick="resetAnimation('rebase')">↺ Reset</button>
+            </div>
+        </div>
+        <canvas class="git-canvas" id="canvas-rebase" width="860" height="340"></canvas>
+        <div class="step-indicator" id="step-rebase">Click Play to see commits <span class="highlight">rebased</span> onto main</div>
+    </div>
+    <div class="warning-box">
+        <div class="tip-label">⚠️ Golden Rule</div>
+        <strong>Never rebase public/shared branches.</strong> Rebase rewrites commit hashes, which causes problems for anyone who has already pulled the original commits.
+    </div>
+</section>
+
+<!-- GIT CHERRY-PICK -->
+<section class="cmd-section" id="git-cherry-pick">
+    <h3 class="cmd-title">git cherry-pick <span class="badge badge-advanced">Advanced</span></h3>
+    <p class="cmd-subtitle">Apply specific commits from another branch</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git cherry-pick</code> <span class="placeholder">&lt;commit-hash&gt;</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Copies a single commit (or multiple) from one branch and applies it on top of your current branch. Creates <strong>new commits</strong> with different hashes but the same changes.</p>
+    </div>
+    <div class="anim-container">
+        <div class="anim-header">
+            <span>🎬 Animation: git cherry-pick</span>
+            <div class="anim-controls">
+                <button class="anim-btn" onclick="playAnimation('cherrypick')">▶ Play</button>
+                <button class="anim-btn" onclick="resetAnimation('cherrypick')">↺ Reset</button>
+            </div>
+        </div>
+        <canvas class="git-canvas" id="canvas-cherrypick" width="860" height="320"></canvas>
+        <div class="step-indicator" id="step-cherrypick">Click Play to see a commit <span class="highlight">cherry-picked</span> to another branch</div>
+    </div>
+</section>
+
+<!-- ─────────────── REMOTE OPERATIONS ─────────────── -->
+<h2 class="category-header" style="color:var(--accent)">🌐 Remote Operations</h2>
+<p class="category-sub">Collaborate with others using remote repositories.</p>
+
+<!-- GIT REMOTE -->
+<section class="cmd-section" id="git-remote">
+    <h3 class="cmd-title">git remote <span class="badge badge-remote">Remote</span></h3>
+    <p class="cmd-subtitle">Manage remote repository connections</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git remote</code> <span class="flag">[add | remove | rename | -v]</span> <span class="placeholder">&lt;name&gt; &lt;url&gt;</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Remotes are bookmarks to other repositories. <strong>origin</strong> is the conventional name for the primary remote.</p>
+    </div>
+    <table class="flags-table">
+        <tr><th>Command</th><th>Description</th></tr>
+        <tr><td>git remote -v</td><td>List remotes with URLs</td></tr>
+        <tr><td>git remote add origin &lt;url&gt;</td><td>Add a remote named origin</td></tr>
+        <tr><td>git remote remove &lt;name&gt;</td><td>Remove a remote</td></tr>
+        <tr><td>git remote rename &lt;old&gt; &lt;new&gt;</td><td>Rename a remote</td></tr>
+    </table>
+</section>
+
+<!-- GIT FETCH -->
+<section class="cmd-section" id="git-fetch">
+    <h3 class="cmd-title">git fetch <span class="badge badge-remote">Remote</span></h3>
+    <p class="cmd-subtitle">Download objects and refs from a remote</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git fetch</code> <span class="placeholder">[remote]</span> <span class="flag">[--all] [--prune]</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Downloads commits, files, and refs from a remote repository into your local repo. It <strong>does NOT merge</strong> anything — your working directory stays untouched. Safe to run anytime.</p>
+    </div>
+    <div class="anim-container">
+        <div class="anim-header">
+            <span>🎬 Animation: git fetch</span>
+            <div class="anim-controls">
+                <button class="anim-btn" onclick="playAnimation('fetch')">▶ Play</button>
+                <button class="anim-btn" onclick="resetAnimation('fetch')">↺ Reset</button>
+            </div>
+        </div>
+        <canvas class="git-canvas" id="canvas-fetch" width="860" height="300"></canvas>
+        <div class="step-indicator" id="step-fetch">Click Play to see <span class="highlight">remote commits</span> downloaded locally</div>
+    </div>
+</section>
+
+<!-- GIT PULL -->
+<section class="cmd-section" id="git-pull">
+    <h3 class="cmd-title">git pull <span class="badge badge-remote">Remote</span></h3>
+    <p class="cmd-subtitle">Fetch and integrate remote changes</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git pull</code> <span class="placeholder">[remote] [branch]</span> <span class="flag">[--rebase]</span>
+    </div>
+    <div class="cmd-desc">
+        <p><code>git pull</code> = <code>git fetch</code> + <code>git merge</code>. It downloads remote changes and immediately merges them into your current branch.</p>
+        <ul>
+            <li><code>git pull</code> — fetch + merge from tracking branch</li>
+            <li><code>git pull --rebase</code> — fetch + rebase instead of merge (cleaner history)</li>
+            <li><code>git pull origin main</code> — pull specifically from origin/main</li>
+        </ul>
+    </div>
+    <div class="anim-container">
+        <div class="anim-header">
+            <span>🎬 Animation: git pull</span>
+            <div class="anim-controls">
+                <button class="anim-btn" onclick="playAnimation('pull')">▶ Play</button>
+                <button class="anim-btn" onclick="resetAnimation('pull')">↺ Reset</button>
+            </div>
+        </div>
+        <canvas class="git-canvas" id="canvas-pull" width="860" height="320"></canvas>
+        <div class="step-indicator" id="step-pull">Click Play to see <span class="highlight">fetch + merge</span> in action</div>
+    </div>
+</section>
+
+<!-- GIT PUSH -->
+<section class="cmd-section" id="git-push">
+    <h3 class="cmd-title">git push <span class="badge badge-remote">Remote</span></h3>
+    <p class="cmd-subtitle">Upload local commits to a remote repository</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git push</code> <span class="placeholder">[remote] [branch]</span> <span class="flag">[-u | --force]</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Uploads your local commits to the remote repository, updating the remote branch.</p>
+    </div>
+    <table class="flags-table">
+        <tr><th>Command</th><th>Description</th></tr>
+        <tr><td>git push</td><td>Push current branch to its upstream</td></tr>
+        <tr><td>git push -u origin main</td><td>Push and set upstream tracking</td></tr>
+        <tr><td>git push --force</td><td>Force push (overwrites remote – dangerous!)</td></tr>
+        <tr><td>git push --force-with-lease</td><td>Safer force push (fails if remote has new commits)</td></tr>
+        <tr><td>git push --tags</td><td>Push all tags to remote</td></tr>
+    </table>
+    <div class="anim-container">
+        <div class="anim-header">
+            <span>🎬 Animation: git push</span>
+            <div class="anim-controls">
+                <button class="anim-btn" onclick="playAnimation('push')">▶ Play</button>
+                <button class="anim-btn" onclick="resetAnimation('push')">↺ Reset</button>
+            </div>
+        </div>
+        <canvas class="git-canvas" id="canvas-push" width="860" height="300"></canvas>
+        <div class="step-indicator" id="step-push">Click Play to see local commits <span class="highlight">pushed</span> to remote</div>
+    </div>
+</section>
+
+<!-- ─────────────── UNDO & HISTORY ─────────────── -->
+<h2 class="category-header" style="color:var(--red)">⏪ Undo & History</h2>
+<p class="category-sub">Undo mistakes, reset state, and manage versions.</p>
+
+<!-- GIT RESET -->
+<section class="cmd-section" id="git-reset">
+    <h3 class="cmd-title">git reset <span class="badge badge-undo">Undo</span></h3>
+    <p class="cmd-subtitle">Reset current HEAD to a specified state</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git reset</code> <span class="flag">[--soft | --mixed | --hard]</span> <span class="placeholder">&lt;commit&gt;</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Moves the current branch pointer back to a previous commit. The three modes control what happens to your changes:</p>
+        <ul>
+            <li><strong style="color:var(--green)">--soft</strong> — moves HEAD only. Staging area and working dir unchanged. Changes become "staged".</li>
+            <li><strong style="color:var(--orange)">--mixed</strong> (default) — moves HEAD and resets staging area. Working dir unchanged. Changes become "unstaged".</li>
+            <li><strong style="color:var(--red)">--hard</strong> — moves HEAD, resets staging area AND working directory. <em>All changes are lost!</em></li>
+        </ul>
+    </div>
+    <div class="anim-container">
+        <div class="anim-header">
+            <span>🎬 Animation: git reset modes</span>
+            <div class="anim-controls">
+                <button class="anim-btn" onclick="playAnimation('reset')">▶ Play</button>
+                <button class="anim-btn" onclick="resetAnimation('reset')">↺ Reset</button>
+            </div>
+        </div>
+        <canvas class="git-canvas" id="canvas-reset" width="860" height="350"></canvas>
+        <div class="step-indicator" id="step-reset">Click Play to compare <span class="highlight">--soft, --mixed, --hard</span></div>
+    </div>
+    <div class="warning-box">
+        <div class="tip-label">⚠️ Warning</div>
+        <code>git reset --hard</code> permanently destroys uncommitted changes. Use with caution! If you've already pushed, prefer <code>git revert</code> instead.
+    </div>
+</section>
+
+<!-- GIT REVERT -->
+<section class="cmd-section" id="git-revert">
+    <h3 class="cmd-title">git revert <span class="badge badge-undo">Undo</span></h3>
+    <p class="cmd-subtitle">Create a new commit that undoes a previous commit</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git revert</code> <span class="placeholder">&lt;commit&gt;</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Instead of deleting history (like reset), revert creates a <strong>new commit</strong> that applies the inverse of the specified commit. This is safe for shared/public branches.</p>
+    </div>
+    <div class="anim-container">
+        <div class="anim-header">
+            <span>🎬 Animation: git revert</span>
+            <div class="anim-controls">
+                <button class="anim-btn" onclick="playAnimation('revert')">▶ Play</button>
+                <button class="anim-btn" onclick="resetAnimation('revert')">↺ Reset</button>
+            </div>
+        </div>
+        <canvas class="git-canvas" id="canvas-revert" width="860" height="280"></canvas>
+        <div class="step-indicator" id="step-revert">Click Play to see a <span class="highlight">revert commit</span> being created</div>
+    </div>
+</section>
+
+<!-- GIT RESTORE -->
+<section class="cmd-section" id="git-restore">
+    <h3 class="cmd-title">git restore <span class="badge badge-undo">Undo</span></h3>
+    <p class="cmd-subtitle">Restore working tree files or unstage changes</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git restore</code> <span class="placeholder">&lt;file&gt;</span><br>
+        <code>git restore</code> <span class="flag">--staged</span> <span class="placeholder">&lt;file&gt;</span>
+    </div>
+    <div class="cmd-desc">
+        <ul>
+            <li><code>git restore file.txt</code> — discard changes in working directory (revert to last commit)</li>
+            <li><code>git restore --staged file.txt</code> — unstage a file (opposite of <code>git add</code>)</li>
+            <li><code>git restore --source=HEAD~2 file.txt</code> — restore file from 2 commits ago</li>
+        </ul>
+    </div>
+</section>
+
+<!-- GIT TAG -->
+<section class="cmd-section" id="git-tag">
+    <h3 class="cmd-title">git tag <span class="badge badge-advanced">Advanced</span></h3>
+    <p class="cmd-subtitle">Create, list, and manage tags (version markers)</p>
+    <div class="syntax-box">
+        <span class="label">Syntax</span>
+        <code>git tag</code> <span class="placeholder">&lt;tagname&gt;</span> <span class="flag">[-a] [-m "message"]</span> <span class="placeholder">[commit]</span>
+    </div>
+    <div class="cmd-desc">
+        <p>Tags mark specific commits as important — usually for <strong>releases</strong> (v1.0, v2.3.1, etc.).</p>
+        <ul>
+            <li><strong>Lightweight tag</strong> — just a name pointing to a commit: <code>git tag v1.0</code></li>
+            <li><strong>Annotated tag</strong> — stores metadata (author, date, message): <code>git tag -a v1.0 -m "Release 1.0"</code></li>
+        </ul>
+    </div>
+    <table class="flags-table">
+        <tr><th>Command</th><th>Description</th></tr>
+        <tr><td>git tag</td><td>List all tags</td></tr>
+        <tr><td>git tag v1.0</td><td>Create lightweight tag at HEAD</td></tr>
+        <tr><td>git tag -a v1.0 -m "msg"</td><td>Create annotated tag</td></tr>
+        <tr><td>git tag -d v1.0</td><td>Delete a tag</td></tr>
+        <tr><td>git push origin v1.0</td><td>Push a specific tag to remote</td></tr>
+    </table>
+    <div class="anim-container">
+        <div class="anim-header">
+            <span>🎬 Animation: git tag</span>
+            <div class="anim-controls">
+                <button class="anim-btn" onclick="playAnimation('tag')">▶ Play</button>
+                <button class="anim-btn" onclick="resetAnimation('tag')">↺ Reset</button>
+            </div>
+        </div>
+        <canvas class="git-canvas" id="canvas-tag" width="860" height="260"></canvas>
+        <div class="step-indicator" id="step-tag">Click Play to see a <span class="highlight">tag</span> placed on a commit</div>
+    </div>
+</section>
+
+<!-- Footer -->
+<div style="text-align:center; padding:48px 0 0; border-top:1px solid var(--border); color:var(--muted); font-size:13px;">
+    <p>Made with ❤️ for learning Git | Interactive Guide with Animated Visualizations</p>
+    <p style="margin-top:6px;">Tip: Click <strong style="color:var(--accent)">▶ Play</strong> on any animation to see how the command affects the Git tree</p>
+</div>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--               JAVASCRIPT ENGINE                 -->
+<!-- ═══════════════════════════════════════════════ -->
+<script>
+// ─── GLOBALS ───────────────────────────────────
+const COLORS = {
+    commit: '#58a6ff', branch: '#3fb950', head: '#f85149',
+    stash: '#d29922', remote: '#bc8cff', tag: '#f778ba',
+    line: '#30363d', text: '#e6edf3', muted: '#8b949e',
+    bg: '#161b22', green: '#3fb950', red: '#f85149',
+    orange: '#d29922', cyan: '#39d2c0', surface: '#1c2129',
+    ghostCommit: 'rgba(88,166,255,0.25)', ghostLine: 'rgba(48,54,61,0.5)'
+};
+const DPR = window.devicePixelRatio || 1;
+const animations = {};
+
+// ─── UTILITY ───────────────────────────────────
+function setupCanvas(id) {
+    const c = document.getElementById(id);
+    const rect = c.getBoundingClientRect();
+    c.width = rect.width * DPR;
+    c.height = rect.height * DPR;
+    const ctx = c.getContext('2d');
+    ctx.scale(DPR, DPR);
+    ctx.w = rect.width;
+    ctx.h = rect.height;
+    return ctx;
+}
+
+function drawCommit(ctx, x, y, r, color, label, glow) {
+    ctx.save();
+    if (glow) {
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 18;
+    }
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    if (label) {
+        ctx.fillStyle = '#fff';
+        ctx.font = `bold ${r > 14 ? 11 : 9}px ${getComputedStyle(document.body).fontFamily}`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(label, x, y);
+    }
+    ctx.restore();
+}
+
+function drawLine(ctx, x1, y1, x2, y2, color, width, dash) {
+    ctx.save();
+    ctx.beginPath();
+    if (dash) ctx.setLineDash(dash);
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = color || COLORS.line;
+    ctx.lineWidth = width || 2.5;
+    ctx.stroke();
+    ctx.restore();
+}
+
+function drawCurve(ctx, x1, y1, cx, cy, x2, y2, color, width) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.quadraticCurveTo(cx, cy, x2, y2);
+    ctx.strokeStyle = color || COLORS.line;
+    ctx.lineWidth = width || 2.5;
+    ctx.stroke();
+    ctx.restore();
+}
+
+function drawLabel(ctx, x, y, text, color, fontSize) {
+    ctx.save();
+    ctx.fillStyle = color || COLORS.text;
+    ctx.font = `bold ${fontSize || 12}px ${getComputedStyle(document.body).fontFamily}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, x, y);
+    ctx.restore();
+}
+
+function drawBranchLabel(ctx, x, y, text, color, isHead) {
+    ctx.save();
+    const f = 11;
+    ctx.font = `bold ${f}px ${getComputedStyle(document.body).fontFamily}`;
+    const w = ctx.measureText(text).width + 16;
+    const h = 22;
+    const rx = x - w / 2, ry = y - h / 2;
+    ctx.beginPath();
+    ctx.roundRect(rx, ry, w, h, 6);
+    ctx.fillStyle = isHead ? COLORS.head : (color || COLORS.branch);
+    ctx.globalAlpha = 0.18;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = isHead ? COLORS.head : (color || COLORS.green);
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = isHead ? COLORS.head : (color || COLORS.green);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, x, y);
+    ctx.restore();
+}
+
+function drawArrow(ctx, fromX, fromY, toX, toY, color) {
+    const headLen = 10;
+    const angle = Math.atan2(toY - fromY, toX - fromX);
+    ctx.save();
+    ctx.strokeStyle = color || COLORS.commit;
+    ctx.fillStyle = color || COLORS.commit;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(fromX, fromY);
+    ctx.lineTo(toX, toY);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(toX, toY);
+    ctx.lineTo(toX - headLen * Math.cos(angle - Math.PI / 6), toY - headLen * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(toX - headLen * Math.cos(angle + Math.PI / 6), toY - headLen * Math.sin(angle + Math.PI / 6));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+}
+
+function drawBox(ctx, x, y, w, h, text, color, filled) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(x - w/2, y - h/2, w, h, 8);
+    if (filled) {
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.12;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = color;
+    ctx.font = `bold 13px ${getComputedStyle(document.body).fontFamily}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, x, y);
+    ctx.restore();
+}
+
+function drawFileIcon(ctx, x, y, color, label) {
+    ctx.save();
+    const w = 28, h = 34;
+    ctx.beginPath();
+    ctx.moveTo(x - w/2, y - h/2);
+    ctx.lineTo(x + w/2 - 8, y - h/2);
+    ctx.lineTo(x + w/2, y - h/2 + 8);
+    ctx.lineTo(x + w/2, y + h/2);
+    ctx.lineTo(x - w/2, y + h/2);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.15;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    if (label) {
+        ctx.fillStyle = color;
+        ctx.font = `9px ${getComputedStyle(document.body).fontFamily}`;
+        ctx.textAlign = 'center';
+        ctx.fillText(label, x, y + h/2 + 12);
+    }
+    ctx.restore();
+}
+
+function clearCanvas(ctx) {
+    ctx.clearRect(0, 0, ctx.w, ctx.h);
+}
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+function easeInOut(t) { return t < 0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+
+function setStep(id, html) {
+    document.getElementById('step-' + id).innerHTML = html;
+}
+
+// ─── ANIMATION: git init ───────────────────────
+function animInit(ctx, step, t) {
+    clearCanvas(ctx);
+    const cx = ctx.w / 2, cy = ctx.h / 2;
+
+    if (step >= 0) {
+        // empty directory
+        const a = easeOut(Math.min(t * 2, 1));
+        ctx.globalAlpha = a;
+        drawBox(ctx, cx - 160, cy, 120, 50, '📂 my-project/', COLORS.muted, true);
+        ctx.globalAlpha = 1;
+    }
+    if (step >= 1) {
+        // arrow
+        const a = easeOut(Math.min((t - 0.3) * 3, 1));
+        if (a > 0) {
+            ctx.globalAlpha = a;
+            drawArrow(ctx, cx - 90, cy, cx - 20, cy, COLORS.commit);
+            drawLabel(ctx, cx - 55, cy - 18, 'git init', COLORS.green, 11);
+            ctx.globalAlpha = 1;
+        }
+    }
+    if (step >= 2) {
+        // .git folder
+        const a = easeOut(Math.min((t - 0.5) * 3, 1));
+        if (a > 0) {
+            ctx.globalAlpha = a;
+            drawBox(ctx, cx + 100, cy - 30, 130, 36, '📁 .git/', COLORS.green, true);
+            drawBox(ctx, cx + 100, cy + 10, 130, 22, 'objects/ refs/ HEAD', COLORS.muted, false);
+            ctx.globalAlpha = 1;
+        }
+    }
+    if (step >= 3) {
+        const a = easeOut(Math.min((t - 0.7) * 3, 1));
+        if (a > 0) {
+            ctx.globalAlpha = a;
+            drawBranchLabel(ctx, cx + 260, cy - 20, 'HEAD', COLORS.head, true);
+            drawLabel(ctx, cx + 260, cy + 10, '(no commits yet)', COLORS.muted, 10);
+            ctx.globalAlpha = 1;
+        }
+    }
+}
+
+// ─── ANIMATION: git clone ──────────────────────
+function animClone(ctx, step, t) {
+    clearCanvas(ctx);
+    const cy = ctx.h / 2;
+
+    // Remote repo
+    ctx.globalAlpha = step >= 0 ? easeOut(Math.min(t*2,1)) : 0;
+    drawBox(ctx, 120, cy - 20, 160, 60, '☁️ Remote Repo', COLORS.remote, true);
+    for (let i = 0; i < 3; i++) {
+        drawCommit(ctx, 70 + i*40, cy + 40, 10, COLORS.remote, `C${i+1}`, false);
+        if (i > 0) drawLine(ctx, 70 + (i-1)*40 + 10, cy + 40, 70 + i*40 - 10, cy + 40, COLORS.remote, 2);
+    }
+    ctx.globalAlpha = 1;
+
+    if (step >= 1) {
+        const a = easeOut(Math.min((t-0.2)*3,1));
+        if (a > 0) {
+            ctx.globalAlpha = a;
+            // arrow
+            const ax = lerp(200, 340, easeInOut(Math.min((t-0.2)*2,1)));
+            drawArrow(ctx, 210, cy, ax, cy, COLORS.accent);
+            drawLabel(ctx, 300, cy - 18, 'git clone', COLORS.green, 11);
+            ctx.globalAlpha = 1;
+        }
+    }
+    if (step >= 2) {
+        const a = easeOut(Math.min((t-0.5)*3,1));
+        if (a > 0) {
+            ctx.globalAlpha = a;
+            drawBox(ctx, 530, cy - 20, 170, 60, '💻 Local Clone', COLORS.green, true);
+            for (let i = 0; i < 3; i++) {
+                drawCommit(ctx, 475 + i*40, cy + 40, 10, COLORS.commit, `C${i+1}`, false);
+                if (i > 0) drawLine(ctx, 475 + (i-1)*40 + 10, cy + 40, 475 + i*40 - 10, cy + 40, COLORS.commit, 2);
+            }
+            drawBranchLabel(ctx, 555 + 30, cy + 65, 'main', COLORS.green, false);
+            drawBranchLabel(ctx, 555 + 100, cy + 65, 'HEAD', COLORS.head, true);
+            drawBranchLabel(ctx, 555 + 30, cy + 90, 'origin/main', COLORS.remote, false);
+            ctx.globalAlpha = 1;
+        }
+    }
+}
+
+// ─── ANIMATION: git add ────────────────────────
+function animAdd(ctx, step, t) {
+    clearCanvas(ctx);
+    const cy = ctx.h / 2;
+
+    // Three zones
+    drawBox(ctx, 130, 30, 200, 28, 'Working Directory', COLORS.muted, true);
+    drawBox(ctx, 400, 30, 180, 28, 'Staging Area', COLORS.orange, true);
+    drawBox(ctx, 670, 30, 180, 28, 'Repository', COLORS.green, true);
+
+    // files in working dir
+    const files = ['app.js', 'style.css', 'index.html'];
+    const fileColors = [COLORS.red, COLORS.red, COLORS.green];
+    for (let i = 0; i < 3; i++) {
+        const fy = 80 + i * 55;
+        if (step >= 1 && i < 2) {
+            // animate movement
+            const moveT = easeInOut(Math.min(Math.max(t - 0.3 - i*0.15, 0) * 3, 1));
+            const fx = lerp(130, 400, moveT);
+            drawFileIcon(ctx, fx, fy, moveT > 0.5 ? COLORS.orange : COLORS.red, files[i]);
+        } else {
+            drawFileIcon(ctx, 130, fy, fileColors[i], files[i]);
+        }
+    }
+
+    // staged indicator
+    if (step >= 2) {
+        const a = easeOut(Math.min((t-0.7)*4,1));
+        ctx.globalAlpha = a;
+        drawLabel(ctx, 400, cy + 55, '✓ Staged & ready to commit', COLORS.orange, 11);
+        ctx.globalAlpha = 1;
+    }
+}
+
+// ─── ANIMATION: git commit ─────────────────────
+function animCommit(ctx, step, t) {
+    clearCanvas(ctx);
+    const cy = ctx.h / 2;
+    const baseX = 120, gap = 100;
+
+    // existing commits
+    for (let i = 0; i < 3; i++) {
+        const x = baseX + i * gap;
+        drawCommit(ctx, x, cy, 18, COLORS.commit, `C${i+1}`, false);
+        if (i > 0) drawLine(ctx, baseX + (i-1)*gap + 18, cy, x - 18, cy, COLORS.line, 2.5);
+    }
+
+    // branch label on C3
+    drawBranchLabel(ctx, baseX + 2*gap, cy - 35, 'main', COLORS.green, false);
+
+    if (step >= 1) {
+        // new commit appearing
+        const a = easeOut(Math.min(t * 2, 1));
+        const newX = baseX + 3 * gap;
+        ctx.globalAlpha = a;
+        drawLine(ctx, baseX + 2*gap + 18, cy, newX - 18, cy, COLORS.line, 2.5);
+        drawCommit(ctx, newX, cy, 18, COLORS.green, 'C4', true);
+        ctx.globalAlpha = 1;
+    }
+
+    if (step >= 2) {
+        // move branch & HEAD
+        const a = easeOut(Math.min((t-0.4)*3,1));
+        const labelX = lerp(baseX + 2*gap, baseX + 3*gap, a);
+        drawBranchLabel(ctx, labelX, cy - 35, 'main', COLORS.green, false);
+        drawBranchLabel(ctx, labelX, cy - 58, 'HEAD', COLORS.head, true);
+    }
+
+    if (step >= 3) {
+        const a = easeOut(Math.min((t-0.7)*4,1));
+        ctx.globalAlpha = a;
+        // commit info
+        drawLabel(ctx, baseX + 3*gap, cy + 40, 'sha: a1b2c3d', COLORS.muted, 10);
+        drawLabel(ctx, baseX + 3*gap, cy + 55, '"Add new feature"', COLORS.muted, 10);
+        ctx.globalAlpha = 1;
+    }
+}
+
+// ─── ANIMATION: git stash ──────────────────────
+function animStash(ctx, step, t) {
+    clearCanvas(ctx);
+    const cy = ctx.h / 2;
+
+    // Working directory with changes
+    drawBox(ctx, 150, cy - 30, 200, 50, '📝 Working Changes', COLORS.orange, true);
+    drawLabel(ctx, 150, cy + 5, 'modified: app.js, utils.js', COLORS.muted, 10);
+
+    if (step === 0) {
+        const a = easeOut(Math.min(t*2,1));
+        ctx.globalAlpha = a;
+        drawLabel(ctx, 150, cy + 55, 'uncommitted work...', COLORS.muted, 11);
+        ctx.globalAlpha = 1;
+    }
+
+    if (step >= 1) {
+        // stash animation
+        const moveT = easeInOut(Math.min(t*1.5,1));
+        const sy = lerp(cy - 30, cy + 60, moveT);
+        const a = moveT;
+        ctx.globalAlpha = a;
+        drawBox(ctx, 430, sy, 180, 44, '📦 Stash@{0}', COLORS.stash, true);
+        // arrow
+        drawArrow(ctx, 260, cy - 20, 340, sy, COLORS.stash);
+        drawLabel(ctx, 300, cy - 45, 'git stash', COLORS.green, 11);
+        ctx.globalAlpha = 1;
+    }
+
+    if (step >= 2) {
+        // clean working dir
+        const a = easeOut(Math.min((t-0.4)*3,1));
+        ctx.globalAlpha = a;
+        drawBox(ctx, 150, cy - 30, 200, 50, '✨ Clean Working Dir', COLORS.green, true);
+        ctx.globalAlpha = 1;
+    }
+
+    if (step >= 3) {
+        // pop
+        const moveT = easeInOut(Math.min((t-0.6)*2.5,1));
+        const px = lerp(430, 650, moveT);
+        ctx.globalAlpha = easeOut(Math.min((t-0.6)*3,1));
+        drawArrow(ctx, 520, cy + 60, 580, cy, COLORS.green);
+        drawLabel(ctx, 560, cy - 20, 'git stash pop', COLORS.green, 11);
+        drawBox(ctx, 680, cy, 200, 50, '📝 Changes Restored', COLORS.green, true);
+        ctx.globalAlpha = 1;
+    }
+}
+
+// ─── ANIMATION: git log ────────────────────────
+function animLog(ctx, step, t) {
+    clearCanvas(ctx);
+    const cy = ctx.h / 2;
+    const baseX = 80, gap = 90;
+    const numCommits = Math.min(step + 1, 6);
+
+    for (let i = 0; i < numCommits; i++) {
+        const appear = easeOut(Math.min((t - i*0.08)*3, 1));
+        if (appear <= 0) continue;
+        const x = baseX + i * gap;
+        ctx.globalAlpha = appear;
+        drawCommit(ctx, x, cy, 16, COLORS.commit, `C${i+1}`, i === numCommits-1);
+        if (i > 0) drawLine(ctx, baseX + (i-1)*gap + 16, cy, x - 16, cy, COLORS.line, 2);
+
+        // show hash below
+        ctx.font = `9px ${getComputedStyle(document.body).fontFamily}`;
+        ctx.fillStyle = COLORS.muted;
+        ctx.textAlign = 'center';
+        const hash = ['a1b2c3', 'f4e5d6', '789abc', 'def012', '345678', '9abcde'][i];
+        ctx.fillText(hash, x, cy + 30);
+        ctx.globalAlpha = 1;
+    }
+
+    // Branch label on latest
+    if (numCommits > 0) {
+        const lx = baseX + (numCommits-1) * gap;
+        drawBranchLabel(ctx, lx, cy - 32, 'main', COLORS.green, false);
+        drawBranchLabel(ctx, lx + 55, cy - 32, 'HEAD', COLORS.head, true);
+    }
+
+    // feature branch at C3
+    if (step >= 4) {
+        const a = easeOut(Math.min((t-0.3)*3,1));
+        ctx.globalAlpha = a;
+        const bx = baseX + 2*gap, by = cy - 65;
+        drawCurve(ctx, bx, cy - 16, bx + 30, by + 20, bx + 60, by, COLORS.remote, 2);
+        drawCommit(ctx, bx + 60, by, 14, COLORS.remote, 'F1', false);
+        drawCommit(ctx, bx + 140, by, 14, COLORS.remote, 'F2', false);
+        drawLine(ctx, bx + 74, by, bx + 126, by, COLORS.remote, 2);
+        drawBranchLabel(ctx, bx + 140, by - 28, 'feature', COLORS.remote, false);
+        ctx.globalAlpha = 1;
+    }
+}
+
+// ─── ANIMATION: git branch ────────────────────
+function animBranch(ctx, step, t) {
+    clearCanvas(ctx);
+    const cy = ctx.h / 2 + 20;
+    const baseX = 100, gap = 100;
+
+    // main line commits
+    for (let i = 0; i < 4; i++) {
+        const x = baseX + i * gap;
+        drawCommit(ctx, x, cy, 16, COLORS.commit, `C${i+1}`, false);
+        if (i > 0) drawLine(ctx, baseX + (i-1)*gap + 16, cy, x - 16, cy, COLORS.line, 2.5);
+    }
+    drawBranchLabel(ctx, baseX + 3*gap, cy - 30, 'main', COLORS.green, false);
+    drawBranchLabel(ctx, baseX + 3*gap + 55, cy - 30, 'HEAD', COLORS.head, true);
+
+    if (step >= 1) {
+        // new branch label appearing
+        const a = easeOut(Math.min(t*2,1));
+        ctx.globalAlpha = a;
+        const scale = lerp(0.5, 1, a);
+        drawBranchLabel(ctx, baseX + 3*gap, cy - 58, 'feature ✨', COLORS.remote, false);
+        drawLabel(ctx, baseX + 3*gap, cy + 30, 'Branch created! (same commit)', COLORS.muted, 10);
+        ctx.globalAlpha = 1;
+    }
+
+    if (step >= 2) {
+        // feature diverges
+        const a = easeOut(Math.min((t-0.4)*2.5,1));
+        ctx.globalAlpha = a;
+        const bx = baseX + 3*gap;
+        drawCurve(ctx, bx, cy - 16, bx + 40, cy - 50, bx + 80, cy - 65, COLORS.remote, 2.5);
+        drawCommit(ctx, bx + 80, cy - 65, 16, COLORS.remote, 'F1', true);
+        drawBranchLabel(ctx, bx + 80, cy - 95, 'feature', COLORS.remote, false);
+        ctx.globalAlpha = 1;
+    }
+
+    if (step >= 3) {
+        // main also advances
+        const a = easeOut(Math.min((t-0.6)*3,1));
+        ctx.globalAlpha = a;
+        const mx = baseX + 4*gap;
+        drawLine(ctx, baseX + 3*gap + 16, cy, mx - 16, cy, COLORS.line, 2.5);
+        drawCommit(ctx, mx, cy, 16, COLORS.commit, 'C5', true);
+        drawBranchLabel(ctx, mx, cy - 30, 'main', COLORS.green, false);
+        ctx.globalAlpha = 1;
+    }
+}
+
+// ─── ANIMATION: git merge ─────────────────────
+function animMerge(ctx, step, t) {
+    clearCanvas(ctx);
+    const cy = ctx.h / 2 + 30;
+    const baseX = 80, gap = 90;
+
+    // main line
+    for (let i = 0; i < 4; i++) {
+        const x = baseX + i * gap;
+        drawCommit(ctx, x, cy, 16, COLORS.commit, `C${i+1}`, false);
+        if (i > 0) drawLine(ctx, baseX + (i-1)*gap + 16, cy, x - 16, cy, COLORS.line, 2.5);
+    }
+    drawBranchLabel(ctx, baseX + 3*gap, cy - 30, 'main', COLORS.green, false);
+
+    // Feature branch from C2
+    const forkX = baseX + 1*gap;
+    const fy = cy - 70;
+    drawCurve(ctx, forkX, cy - 16, forkX + 30, fy + 20, forkX + 60, fy, COLORS.remote, 2.5);
+    drawCommit(ctx, forkX + 60, fy, 16, COLORS.remote, 'F1', false);
+    drawCommit(ctx, forkX + 150, fy, 16, COLORS.remote, 'F2', false);
+    drawLine(ctx, forkX + 76, fy, forkX + 134, fy, COLORS.remote, 2.5);
+    drawBranchLabel(ctx, forkX + 150, fy - 30, 'feature', COLORS.remote, false);
+
+    if (step >= 1) {
+        // merge commit
+        const a = easeOut(Math.min(t*2,1));
+        ctx.globalAlpha = a;
+        const mx = baseX + 4*gap;
+        // line from C4
+        drawLine(ctx, baseX + 3*gap + 16, cy, mx - 16, cy, COLORS.line, 2.5);
+        // line from F2 down to merge
+        drawCurve(ctx, forkX + 150, fy + 16, forkX + 170, cy - 20, mx, cy, COLORS.remote, 2.5);
+        // merge commit
+        drawCommit(ctx, mx, cy, 20, COLORS.green, 'M', true);
+        ctx.globalAlpha = 1;
+    }
+
+    if (step >= 2) {
+        const a = easeOut(Math.min((t-0.4)*3,1));
+        const mx = baseX + 4*gap;
+        ctx.globalAlpha = a;
+        drawBranchLabel(ctx, mx, cy - 34, 'main', COLORS.green, false);
+        drawBranchLabel(ctx, mx + 55, cy - 34, 'HEAD', COLORS.head, true);
+        drawLabel(ctx, mx, cy + 35, 'Merge commit (two parents)', COLORS.muted, 10);
+        ctx.globalAlpha = 1;
+    }
+}
+
+// ─── ANIMATION: git rebase ────────────────────
+function animRebase(ctx, step, t) {
+    clearCanvas(ctx);
+    const cy = ctx.h / 2 + 30;
+    const baseX = 70, gap = 85;
+
+    if (step <= 1) {
+        // BEFORE: Show diverged branches
+        // main line
+        for (let i = 0; i < 4; i++) {
+            const x = baseX + i*gap;
+            drawCommit(ctx, x, cy, 15, COLORS.commit, `C${i+1}`, false);
+            if (i > 0) drawLine(ctx, baseX + (i-1)*gap + 15, cy, x - 15, cy, COLORS.line, 2);
+        }
+        drawBranchLabel(ctx, baseX + 3*gap, cy - 28, 'main', COLORS.green, false);
+
+        // feature branch from C2
+        const forkX = baseX + 1*gap;
+        const fy = cy - 65;
+        drawCurve(ctx, forkX, cy - 15, forkX + 25, fy + 15, forkX + 55, fy, COLORS.remote, 2);
+        const ghostAlpha = step >= 1 ? Math.max(0.3, 1 - t) : 1;
+        ctx.globalAlpha = ghostAlpha;
+        drawCommit(ctx, forkX + 55, fy, 15, COLORS.remote, 'F1', false);
+        drawCommit(ctx, forkX + 140, fy, 15, COLORS.remote, 'F2', false);
+        drawLine(ctx, forkX + 70, fy, forkX + 125, fy, COLORS.remote, 2);
+        drawBranchLabel(ctx, forkX + 140, fy - 28, 'feature', COLORS.remote, false);
+        ctx.globalAlpha = 1;
+
+        if (step === 0) {
+            drawLabel(ctx, ctx.w / 2, 25, 'BEFORE: branches have diverged', COLORS.muted, 12);
+        }
+    }
+
+    if (step >= 1) {
+        drawLabel(ctx, ctx.w / 2, 25, 'AFTER: feature rebased onto main', COLORS.green, 12);
+    }
+
+    if (step >= 2) {
+        // AFTER: Linear history
+        clearCanvas(ctx);
+        drawLabel(ctx, ctx.w / 2, 25, 'AFTER: feature rebased onto main (linear history!)', COLORS.green, 12);
+
+        const commits = ['C1','C2','C3','C4','F1\'','F2\''];
+        for (let i = 0; i < commits.length; i++) {
+            const appear = easeOut(Math.min((t - i*0.08)*3, 1));
+            if (appear <= 0) continue;
+            const x = baseX + i*gap;
+            ctx.globalAlpha = appear;
+            const isRebased = i >= 4;
+            drawCommit(ctx, x, cy, 15, isRebased ? COLORS.remote : COLORS.commit, commits[i], isRebased);
+            if (i > 0) drawLine(ctx, baseX + (i-1)*gap + 15, cy, x - 15, cy, COLORS.line, 2);
+            ctx.globalAlpha = 1;
+        }
+
+        const a = easeOut(Math.min((t-0.3)*3,1));
+        ctx.globalAlpha = a;
+        drawBranchLabel(ctx, baseX + 3*gap, cy - 28, 'main', COLORS.green, false);
+        drawBranchLabel(ctx, baseX + 5*gap, cy - 28, 'feature', COLORS.remote, false);
+        drawBranchLabel(ctx, baseX + 5*gap + 60, cy - 28, 'HEAD', COLORS.head, true);
+        drawLabel(ctx, ctx.w / 2, cy + 40, '✨ Clean linear history — no merge commit needed', COLORS.cyan, 11);
+        ctx.globalAlpha = 1;
+    }
+}
+
+// ─── ANIMATION: git cherry-pick ────────────────
+function animCherryPick(ctx, step, t) {
+    clearCanvas(ctx);
+    const cy = ctx.h / 2 + 20;
+    const baseX = 80, gap = 90;
+
+    // main line
+    for (let i = 0; i < 3; i++) {
+        const x = baseX + i*gap;
+        drawCommit(ctx, x, cy, 15, COLORS.commit, `C${i+1}`, false);
+        if (i > 0) drawLine(ctx, baseX+(i-1)*gap+15, cy, x-15, cy, COLORS.line, 2);
+    }
+    drawBranchLabel(ctx, baseX+2*gap, cy-28, 'main', COLORS.green, false);
+    drawBranchLabel(ctx, baseX+2*gap+55, cy-28, 'HEAD', COLORS.head, true);
+
+    // feature branch
+    const forkX = baseX + gap;
+    const fy = cy - 65;
+    drawCurve(ctx, forkX, cy-15, forkX+25, fy+15, forkX+55, fy, COLORS.remote, 2);
+    drawCommit(ctx, forkX+55, fy, 15, COLORS.remote, 'F1', false);
+    drawCommit(ctx, forkX+140, fy, 15, COLORS.remote, 'F2', step >= 1);
+    drawLine(ctx, forkX+70, fy, forkX+125, fy, COLORS.remote, 2);
+    drawBranchLabel(ctx, forkX+140, fy-28, 'feature', COLORS.remote, false);
+
+    if (step >= 1) {
+        // highlight F2 and show cherry-pick
+        const a = easeOut(Math.min(t*2,1));
+        ctx.globalAlpha = a;
+        // dashed arrow from F2 to new commit
+        const newX = baseX + 3*gap;
+        drawLine(ctx, forkX+140, fy+15, newX, cy-15, COLORS.pink, 2, [5,5]);
+        drawLabel(ctx, forkX+180, fy+30, 'cherry-pick', COLORS.pink, 10);
+        ctx.globalAlpha = 1;
+    }
+
+    if (step >= 2) {
+        const a = easeOut(Math.min((t-0.3)*3,1));
+        ctx.globalAlpha = a;
+        const newX = baseX + 3*gap;
+        drawLine(ctx, baseX+2*gap+15, cy, newX-15, cy, COLORS.line, 2);
+        drawCommit(ctx, newX, cy, 15, COLORS.pink, 'F2\'', true);
+        drawBranchLabel(ctx, newX, cy-28, 'main', COLORS.green, false);
+        drawBranchLabel(ctx, newX+55, cy-28, 'HEAD', COLORS.head, true);
+        drawLabel(ctx, newX, cy+25, 'Same changes, new hash', COLORS.muted, 10);
+        ctx.globalAlpha = 1;
+    }
+}
+
+// ─── ANIMATION: git fetch ─────────────────────
+function animFetch(ctx, step, t) {
+    clearCanvas(ctx);
+    const cy = ctx.h / 2;
+
+    // Remote repo (top)
+    drawLabel(ctx, ctx.w/2, 22, '☁️ Remote (origin)', COLORS.remote, 13);
+    const ry = 60;
+    for (let i = 0; i < 4; i++) {
+        const x = 200 + i*80;
+        drawCommit(ctx, x, ry, 13, COLORS.remote, `C${i+1}`, false);
+        if (i > 0) drawLine(ctx, 200+(i-1)*80+13, ry, x-13, ry, COLORS.remote, 2);
+    }
+    // the new remote commit
+    if (step >= 0) {
+        drawCommit(ctx, 200+4*80, ry, 13, COLORS.orange, 'C5', true);
+        drawLine(ctx, 200+3*80+13, ry, 200+4*80-13, ry, COLORS.remote, 2);
+    }
+
+    // Divider
+    drawLine(ctx, 50, cy, ctx.w-50, cy, COLORS.line, 1, [4,4]);
+
+    // Local repo (bottom)
+    drawLabel(ctx, ctx.w/2, cy + 20, '💻 Local', COLORS.green, 13);
+    const ly = cy + 60;
+    for (let i = 0; i < 4; i++) {
+        const x = 200 + i*80;
+        drawCommit(ctx, x, ly, 13, COLORS.commit, `C${i+1}`, false);
+        if (i > 0) drawLine(ctx, 200+(i-1)*80+13, ly, x-13, ly, COLORS.commit, 2);
+    }
+    drawBranchLabel(ctx, 200+3*80, ly-25, 'main / HEAD', COLORS.green, false);
+
+    if (step >= 1) {
+        // fetch arrow
+        const a = easeOut(Math.min(t*2,1));
+        ctx.globalAlpha = a;
+        drawArrow(ctx, 200+4*80, ry+15, 200+4*80, ly-15, COLORS.orange);
+        drawLabel(ctx, 200+4*80 + 50, cy, 'git fetch', COLORS.green, 11);
+        ctx.globalAlpha = 1;
+    }
+
+    if (step >= 2) {
+        const a = easeOut(Math.min((t-0.4)*3,1));
+        ctx.globalAlpha = a;
+        drawCommit(ctx, 200+4*80, ly, 13, COLORS.orange, 'C5', true);
+        drawLine(ctx, 200+3*80+13, ly, 200+4*80-13, ly, COLORS.orange, 2);
+        drawBranchLabel(ctx, 200+4*80, ly-25, 'origin/main', COLORS.remote, false);
+        drawBranchLabel(ctx, 200+3*80, ly+25, 'main / HEAD', COLORS.green, false);
+        drawLabel(ctx, ctx.w/2, ly+55, 'Local main NOT moved — only origin/main updated', COLORS.muted, 10);
+        ctx.globalAlpha = 1;
+    }
+}
+
+// ─── ANIMATION: git pull ──────────────────────
+function animPull(ctx, step, t) {
+    clearCanvas(ctx);
+    const cy = ctx.h / 2;
+
+    // Remote
+    drawLabel(ctx, ctx.w/2, 20, '☁️ Remote (origin)', COLORS.remote, 12);
+    const ry = 55;
+    for (let i = 0; i < 4; i++) {
+        const x = 160 + i*80;
+        drawCommit(ctx, x, ry, 12, COLORS.remote, `C${i+1}`, false);
+        if (i > 0) drawLine(ctx, 160+(i-1)*80+12, ry, x-12, ry, COLORS.remote, 2);
+    }
+    drawCommit(ctx, 160+4*80, ry, 12, COLORS.orange, 'C5', true);
+    drawLine(ctx, 160+3*80+12, ry, 160+4*80-12, ry, COLORS.remote, 2);
+
+    drawLine(ctx, 50, cy-10, ctx.w-50, cy-10, COLORS.line, 1, [4,4]);
+
+    // Local
+    drawLabel(ctx, ctx.w/2, cy+8, '💻 Local', COLORS.green, 12);
+    const ly = cy + 50;
+    for (let i = 0; i < 4; i++) {
+        const x = 160 + i*80;
+        drawCommit(ctx, x, ly, 12, COLORS.commit, `C${i+1}`, false);
+        if (i > 0) drawLine(ctx, 160+(i-1)*80+12, ly, x-12, ly, COLORS.commit, 2);
+    }
+
+    if (step === 0) {
+        drawBranchLabel(ctx, 160+3*80, ly-22, 'main / HEAD', COLORS.green, false);
+    }
+
+    if (step >= 1) {
+        const a = easeOut(Math.min(t*2,1));
+        ctx.globalAlpha = a;
+        drawArrow(ctx, 160+4*80, ry+14, 160+4*80, ly-14, COLORS.orange);
+        drawLabel(ctx, 160+4*80+60, cy, 'fetch + merge', COLORS.green, 10);
+        ctx.globalAlpha = 1;
+    }
+
+    if (step >= 2) {
+        const a = easeOut(Math.min((t-0.4)*3,1));
+        ctx.globalAlpha = a;
+        drawCommit(ctx, 160+4*80, ly, 12, COLORS.green, 'C5', true);
+        drawLine(ctx, 160+3*80+12, ly, 160+4*80-12, ly, COLORS.commit, 2);
+        drawBranchLabel(ctx, 160+4*80, ly-22, 'main / HEAD', COLORS.green, false);
+        drawLabel(ctx, ctx.w/2, ly+40, '✨ Local is now up to date with remote', COLORS.cyan, 11);
+        ctx.globalAlpha = 1;
+    }
+}
+
+// ─── ANIMATION: git push ──────────────────────
+function animPush(ctx, step, t) {
+    clearCanvas(ctx);
+    const cy = ctx.h / 2;
+
+    // Local (bottom)
+    drawLabel(ctx, ctx.w/2, cy+10, '💻 Local', COLORS.green, 12);
+    const ly = cy + 50;
+    for (let i = 0; i < 5; i++) {
+        const x = 140 + i*80;
+        const isNew = i === 4;
+        drawCommit(ctx, x, ly, 12, isNew ? COLORS.green : COLORS.commit, `C${i+1}`, isNew);
+        if (i > 0) drawLine(ctx, 140+(i-1)*80+12, ly, x-12, ly, COLORS.commit, 2);
+    }
+    drawBranchLabel(ctx, 140+4*80, ly-22, 'main / HEAD', COLORS.green, false);
+
+    // Remote (top)
+    drawLabel(ctx, ctx.w/2, 20, '☁️ Remote (origin)', COLORS.remote, 12);
+    const ry = 55;
+    for (let i = 0; i < 4; i++) {
+        const x = 140 + i*80;
+        drawCommit(ctx, x, ry, 12, COLORS.remote, `C${i+1}`, false);
+        if (i > 0) drawLine(ctx, 140+(i-1)*80+12, ry, x-12, ry, COLORS.remote, 2);
+    }
+
+    drawLine(ctx, 50, cy-10, ctx.w-50, cy-10, COLORS.line, 1, [4,4]);
+
+    if (step === 0) {
+        drawBranchLabel(ctx, 140+3*80, ry-22, 'origin/main', COLORS.remote, false);
+    }
+
+    if (step >= 1) {
+        const a = easeOut(Math.min(t*2,1));
+        ctx.globalAlpha = a;
+        drawArrow(ctx, 140+4*80, ly-14, 140+4*80, ry+14, COLORS.green);
+        drawLabel(ctx, 140+4*80+55, cy, 'git push', COLORS.green, 10);
+        ctx.globalAlpha = 1;
+    }
+
+    if (step >= 2) {
+        const a = easeOut(Math.min((t-0.4)*3,1));
+        ctx.globalAlpha = a;
+        drawCommit(ctx, 140+4*80, ry, 12, COLORS.green, 'C5', true);
+        drawLine(ctx, 140+3*80+12, ry, 140+4*80-12, ry, COLORS.remote, 2);
+        drawBranchLabel(ctx, 140+4*80, ry-22, 'origin/main', COLORS.remote, false);
+        drawLabel(ctx, ctx.w/2, ly+35, '✨ Remote now has your latest commits', COLORS.cyan, 11);
+        ctx.globalAlpha = 1;
+    }
+}
+
+// ─── ANIMATION: git reset ─────────────────────
+function animReset(ctx, step, t) {
+    clearCanvas(ctx);
+    const baseX = 80, gap = 90, cy = ctx.h / 2 + 10;
+
+    // 5 commits
+    for (let i = 0; i < 5; i++) {
+        const x = baseX + i*gap;
+        const isLost = step >= 2 && i >= 3;
+        ctx.globalAlpha = isLost ? 0.25 : 1;
+        drawCommit(ctx, x, cy, 15, isLost ? COLORS.muted : COLORS.commit, `C${i+1}`, false);
+        if (i > 0) drawLine(ctx, baseX+(i-1)*gap+15, cy, x-15, cy, isLost ? COLORS.muted : COLORS.line, 2);
+        ctx.globalAlpha = 1;
+    }
+
+    if (step === 0) {
+        drawBranchLabel(ctx, baseX+4*gap, cy-28, 'main / HEAD', COLORS.green, false);
+        drawLabel(ctx, ctx.w/2, 25, 'Current state: HEAD at C5', COLORS.muted, 12);
+    }
+
+    if (step >= 1) {
+        drawLabel(ctx, ctx.w/2, 25, 'git reset HEAD~2  →  Move HEAD back 2 commits', COLORS.orange, 12);
+    }
+
+    if (step >= 2) {
+        const a = easeOut(Math.min(t*2,1));
+        // move label
+        const lx = lerp(baseX+4*gap, baseX+2*gap, a);
+        drawBranchLabel(ctx, lx, cy-28, 'main / HEAD', COLORS.green, false);
+
+        // Show three modes
+        const my = cy + 50;
+        ctx.globalAlpha = easeOut(Math.min((t-0.3)*3,1));
+        drawBox(ctx, 140, my+10, 180, 32, '--soft: changes staged', COLORS.green, true);
+        drawBox(ctx, 370, my+10, 200, 32, '--mixed: changes unstaged', COLORS.orange, true);
+        drawBox(ctx, 610, my+10, 195, 32, '--hard: changes DELETED', COLORS.red, true);
+
+        // strikethrough on C4, C5
+        if (a > 0.8) {
+            ctx.save();
+            ctx.strokeStyle = COLORS.red;
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.6;
+            const x4 = baseX+3*gap, x5 = baseX+4*gap;
+            ctx.beginPath(); ctx.moveTo(x4-18, cy-18); ctx.lineTo(x4+18, cy+18); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x5-18, cy-18); ctx.lineTo(x5+18, cy+18); ctx.stroke();
+            ctx.restore();
+        }
+        ctx.globalAlpha = 1;
+    }
+}
+
+// ─── ANIMATION: git revert ────────────────────
+function animRevert(ctx, step, t) {
+    clearCanvas(ctx);
+    const baseX = 80, gap = 95, cy = ctx.h / 2;
+
+    for (let i = 0; i < 4; i++) {
+        const x = baseX + i*gap;
+        const isBad = i === 3;
+        drawCommit(ctx, x, cy, 15, isBad ? COLORS.red : COLORS.commit, `C${i+1}`, false);
+        if (i > 0) drawLine(ctx, baseX+(i-1)*gap+15, cy, x-15, cy, COLORS.line, 2);
+    }
+
+    if (step === 0) {
+        drawBranchLabel(ctx, baseX+3*gap, cy-28, 'main / HEAD', COLORS.green, false);
+        drawLabel(ctx, baseX+3*gap, cy+28, '← bug in this commit!', COLORS.red, 10);
+    }
+
+    if (step >= 1) {
+        const a = easeOut(Math.min(t*2,1));
+        ctx.globalAlpha = a;
+        // new revert commit
+        const rx = baseX + 4*gap;
+        drawLine(ctx, baseX+3*gap+15, cy, rx-15, cy, COLORS.line, 2);
+        drawCommit(ctx, rx, cy, 16, COLORS.green, '↩C4', true);
+        drawBranchLabel(ctx, rx, cy-28, 'main / HEAD', COLORS.green, false);
+        drawLabel(ctx, rx, cy+30, 'Revert commit', COLORS.muted, 10);
+        // arrow back
+        drawLine(ctx, rx, cy+18, baseX+3*gap, cy+18, COLORS.red, 1.5, [4,4]);
+        ctx.globalAlpha = 1;
+    }
+
+    if (step >= 2) {
+        const a = easeOut(Math.min((t-0.5)*3,1));
+        ctx.globalAlpha = a;
+        drawLabel(ctx, ctx.w/2, cy+60, '✨ History preserved — safe for shared branches', COLORS.cyan, 11);
+        ctx.globalAlpha = 1;
+    }
+}
+
+// ─── ANIMATION: git tag ───────────────────────
+function animTag(ctx, step, t) {
+    clearCanvas(ctx);
+    const baseX = 100, gap = 100, cy = ctx.h / 2 + 10;
+
+    for (let i = 0; i < 4; i++) {
+        const x = baseX + i*gap;
+        drawCommit(ctx, x, cy, 15, COLORS.commit, `C${i+1}`, false);
+        if (i > 0) drawLine(ctx, baseX+(i-1)*gap+15, cy, x-15, cy, COLORS.line, 2);
+    }
+    drawBranchLabel(ctx, baseX+3*gap, cy-28, 'main', COLORS.green, false);
+
+    if (step >= 1) {
+        const a = easeOut(Math.min(t*2,1));
+        ctx.globalAlpha = a;
+        // tag on C2
+        const tx = baseX + gap;
+        drawBranchLabel(ctx, tx, cy-28, '🏷 v1.0', COLORS.pink, false);
+        // line from tag to commit
+        ctx.globalAlpha = 1;
+    }
+
+    if (step >= 2) {
+        const a = easeOut(Math.min((t-0.3)*3,1));
+        ctx.globalAlpha = a;
+        // tag on C4
+        drawBranchLabel(ctx, baseX+3*gap, cy-55, '🏷 v2.0', COLORS.pink, false);
+        drawLabel(ctx, ctx.w/2, cy+40, 'Tags are permanent markers — great for releases!', COLORS.muted, 11);
+        ctx.globalAlpha = 1;
+    }
+}
+
+
+// ═══════════════════════════════════════════════
+//              ANIMATION ENGINE
+// ═══════════════════════════════════════════════
+const animConfigs = {
+    init:       { fn: animInit,       steps: [ [0,0.3], [1,0.5], [2,0.7], [3,0.9] ], msgs: ['Project directory exists...', 'Running <span class="highlight">git init</span>...', 'Created <span class="highlight">.git/</span> directory with objects, refs, HEAD', 'HEAD created — no commits yet. Ready to start!'] },
+    clone:      { fn: animClone,      steps: [ [0,0.2], [1,0.5], [2,0.8] ], msgs: ['Remote repository on server...','Downloading all commits and refs...','Local clone created with all history + <span class="highlight">origin</span> remote set up'] },
+    add:        { fn: animAdd,        steps: [ [0,0.1], [1,0.4], [2,0.8] ], msgs: ['Files modified in <span class="highlight">Working Directory</span>','<span class="highlight">git add</span> moves files to <span class="highlight">Staging Area</span>','Files are staged and ready to be committed'] },
+    commit:     { fn: animCommit,     steps: [ [0,0.05], [1,0.35], [2,0.6], [3,0.8] ], msgs: ['Existing commit history (C1 → C2 → C3)','New commit <span class="highlight">C4</span> created from staged changes','Branch pointer <span class="highlight">main</span> and <span class="highlight">HEAD</span> move to C4','Commit stored with unique SHA hash and message'] },
+    stash:      { fn: animStash,      steps: [ [0,0.05], [1,0.25], [2,0.5], [3,0.7] ], msgs: ['You have uncommitted changes in working directory','<span class="highlight">git stash</span> saves changes to a stash stack','Working directory is now clean — safe to switch branches','<span class="highlight">git stash pop</span> restores your changes'] },
+    log:        { fn: animLog,        steps: [ [0,0.01], [1,0.15], [2,0.3], [3,0.45], [4,0.55], [5,0.75] ], msgs: ['Building commit history...','Adding commits...','Commit graph growing...','More commits...','Feature branch visible — <span class="highlight">git log --graph</span> shows this','Complete history with all branches and their commits'] },
+    branch:     { fn: animBranch,     steps: [ [0,0.01], [1,0.25], [2,0.5], [3,0.75] ], msgs: ['Existing linear history on <span class="highlight">main</span>','<span class="highlight">git branch feature</span> — creates a new pointer at the same commit','Feature branch diverges with its own commit <span class="highlight">F1</span>','Both branches grow independently'] },
+    merge:      { fn: animMerge,      steps: [ [0,0.01], [1,0.35], [2,0.7] ], msgs: ['Two branches have diverged — <span class="highlight">main</span> and <span class="highlight">feature</span>','<span class="highlight">git merge feature</span> creates a merge commit <span class="highlight">M</span> with two parents','<span class="highlight">main</span> now includes all changes from feature branch'] },
+    rebase:     { fn: animRebase,     steps: [ [0,0.01], [1,0.3], [2,0.6] ], msgs: ['BEFORE: feature and main have diverged history','<span class="highlight">git rebase main</span> — original feature commits fade...','AFTER: Feature commits replayed on top of main → clean linear history!'] },
+    cherrypick: { fn: animCherryPick, steps: [ [0,0.01], [1,0.3], [2,0.6] ], msgs: ['Two branches with separate histories','Pick commit <span class="highlight">F2</span> to apply on main...','<span class="highlight">git cherry-pick</span> creates <span class="highlight">F2\'</span> — same changes, new commit hash'] },
+    fetch:      { fn: animFetch,      steps: [ [0,0.01], [1,0.35], [2,0.65] ], msgs: ['Remote has a new commit <span class="highlight">C5</span> that local doesn\'t have','<span class="highlight">git fetch</span> downloads the new data...','<span class="highlight">origin/main</span> updated but your local <span class="highlight">main</span> hasn\'t moved — merge manually'] },
+    pull:       { fn: animPull,       steps: [ [0,0.01], [1,0.35], [2,0.65] ], msgs: ['Remote has <span class="highlight">C5</span> — local is behind','<span class="highlight">git pull</span> = fetch + merge in one step','Local <span class="highlight">main</span> is now up to date with remote!'] },
+    push:       { fn: animPush,       steps: [ [0,0.01], [1,0.35], [2,0.65] ], msgs: ['Local has new commit <span class="highlight">C5</span> — remote doesn\'t have it yet','<span class="highlight">git push</span> uploads local commits...','Remote <span class="highlight">origin/main</span> now includes <span class="highlight">C5</span>'] },
+    reset:      { fn: animReset,      steps: [ [0,0.01], [1,0.3], [2,0.55] ], msgs: ['Current history: HEAD at <span class="highlight">C5</span>','<span class="highlight">git reset HEAD~2</span> — moving HEAD back by 2 commits','HEAD moved to <span class="highlight">C3</span>. Mode determines what happens to C4/C5 changes'] },
+    revert:     { fn: animRevert,     steps: [ [0,0.01], [1,0.35], [2,0.7] ], msgs: ['C4 has a bug — we want to undo it','<span class="highlight">git revert C4</span> creates a new commit that undoes C4\'s changes','History is preserved! Safe for shared branches.'] },
+    tag:        { fn: animTag,        steps: [ [0,0.01], [1,0.35], [2,0.65] ], msgs: ['Commit history on main branch','<span class="highlight">git tag v1.0</span> on C2 — marks release 1.0','<span class="highlight">git tag v2.0</span> on latest — tags are permanent markers!'] },
+};
+
+function playAnimation(key) {
+    if (animations[key] && animations[key].playing) return;
+    const config = animConfigs[key];
+    if (!config) return;
+
+    const ctx = setupCanvas('canvas-' + key);
+    const duration = 4000; // ms total
+    const start = performance.now();
+
+    animations[key] = { playing: true, ctx };
+
+    function frame(now) {
+        if (!animations[key] || !animations[key].playing) return;
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // determine current step
+        let currentStep = 0;
+        for (let i = config.steps.length - 1; i >= 0; i--) {
+            if (progress >= config.steps[i][1]) { currentStep = config.steps[i][0]; break; }
+            if (i === 0) currentStep = config.steps[0][0];
+        }
+        // find active step index for message
+        let msgIdx = 0;
+        for (let i = config.steps.length - 1; i >= 0; i--) {
+            if (progress >= config.steps[i][1]) { msgIdx = i; break; }
+        }
+        setStep(key, config.msgs[msgIdx]);
+
+        config.fn(ctx, currentStep, progress);
+
+        if (progress < 1) {
+            requestAnimationFrame(frame);
+        } else {
+            animations[key].playing = false;
+            setStep(key, config.msgs[config.msgs.length - 1] + ' <span style="color:var(--green)">✓ Done</span>');
+        }
+    }
+    requestAnimationFrame(frame);
+}
+
+function resetAnimation(key) {
+    if (animations[key]) animations[key].playing = false;
+    const ctx = setupCanvas('canvas-' + key);
+    clearCanvas(ctx);
+    const config = animConfigs[key];
+    if (config) {
+        config.fn(ctx, 0, 0);
+        setStep(key, config.msgs[0]);
+    }
+}
+
+// ─── SIDEBAR ACTIVE LINK & MOBILE ──────────────
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+}
+
+// Intersection observer for active nav
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            const link = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-20% 0px -70% 0px' });
+
+document.querySelectorAll('.cmd-section').forEach(s => observer.observe(s));
+
+// Close sidebar on link click (mobile)
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('overlay').classList.remove('open');
+    });
+});
+
+// Init: render initial frames for all canvases
+window.addEventListener('load', () => {
+    Object.keys(animConfigs).forEach(key => {
+        try {
+            const ctx = setupCanvas('canvas-' + key);
+            animConfigs[key].fn(ctx, 0, 0.01);
+        } catch(e) {}
+    });
+});
+
+// Handle resize
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        Object.keys(animConfigs).forEach(key => {
+            if (!animations[key] || !animations[key].playing) {
+                try {
+                    const ctx = setupCanvas('canvas-' + key);
+                    animConfigs[key].fn(ctx, 0, 0.01);
+                } catch(e) {}
+            }
+        });
+    }, 250);
+});
+</script>
+
+</body>
+</html>
